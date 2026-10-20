@@ -1,0 +1,16 @@
+splat64[mips]==0.50.0
+# splat's dependencies at the versions the matching build was made with: a newer
+# spimdisasm or rabbitizer can write different assembly. The canon tools import png, yaml,
+# pygfxd and rabbitizer from these.
+crunch64==0.6.2
+intervaltree==3.1.0
+n64img==0.3.3
+pygfxd==1.0.5
+pylibyaml==0.1.0
+pypng==0.20220715.0
+PyYAML==6.0.3
+rabbitizer==1.16.2
+sortedcontainers==2.4.0
+spimdisasm==1.42.4
+tqdm==4.67.1
+colorama==0.4.6; platform_system == "Windows"

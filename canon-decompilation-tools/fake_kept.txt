@@ -1,0 +1,189 @@
+# fake_kept.txt: the FAKE marks kept as normal code, each of a kind the previous decomps keep.
+# Decided 2026-10-17: a FAKE mark of a kind sm64/OoT keep as normal code (an `if (1) {}`, an
+# unused pad local, two statements on one line, a do-while(0) block, an empty test) meets the FAKE
+# criterion when it is cited. report_progress.py (fake_kept) counts a mark as kept only when a line
+# here names it and cites a precedent; a line that matches no mark, or has no precedent, is reported.
+# Every line below: the precedent was opened at the cited line (live code, not under #if 0, the same
+# kind of construct); the mark's text is copied from its current src line; the recorded measurements
+# show that the plain form changes the code (a measured
+# real or a non-MATCH). Natural forms measured but not matched are not listed.
+# Format, one line per mark:
+#   <file from the repo root> | <the mark's text after FAKE> | <decomp> <file>:<line> | <what it keeps>
+# <decomp> is sm64-decomp, oot-decomp, perfect_dark-decomp, fzerox-decomp or waverace64-decomp, and
+# <file> is relative to that decomp's root. A mark is matched on its file and the first 60
+# characters of its text (fake_key); an empty text matches a bare /* FAKE */.
+src/tlb/tlb_0018_6.c | one line, for the game's order of the 100 and the 10 (IDO_NOTES 12) | sm64-decomp src/game/camera.c:4290 | two statements on one line
+src/tlb/tlb_0026_1.c | (the permuter's find): two dead reads of w->model, which colour the | oot-decomp src/code/z_eff_blure.c:19 | empty test of a field, twice
+src/tlb/tlb_0026_1.c | IDO_NOTES 311, keeps w in its own register (unfolded) | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0026_1.c | as case 1's; with w a block local it keeps the switch's | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0027_0.c | two frame words the game has above i | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[2])
+src/tlb/tlb_0027_1.c | a block boundary before the colours | oot-decomp src/audio/game/general.c:1652 | if (1) {} block boundary
+src/tlb/tlb_0033_0.c | a frame word (frame 0x50, the temps at 0x30); without it 45 | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0033_2.c | a block boundary; it gives 1.0 f0 and the zero f2 | oot-decomp src/audio/game/general.c:1652 | if (1) {} block boundary
+src/tlb/tlb_0033_3.c | (the permuter's find): the do-while(0) stands for a setup macro. Without it | sm64-decomp src/game/camera.c:6984 | do-while(0) block
+src/tlb/tlb_0034.c | keeps p live across the call (the game colours p first, s0) | oot-decomp src/overlays/actors/ovl_Bg_Spot16_Bombstone/z_bg_spot16_bombstone.c:463 | empty test of a pointer
+src/tlb/tlb_0038.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad0)
+src/tlb/tlb_0038.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad1)
+src/tlb/tlb_0038.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad2)
+src/tlb/tlb_0038.c |  | oot-decomp src/code/db_camera.c:1655 | unused pad local (pad3[5])
+src/tlb/tlb_0038.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad4)
+src/tlb/tlb_0038.c | frame words (one was the turn size, now a ?: expression) | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[2])
+src/tlb/tlb_0038.c | an empty test of hp (permuter, focused run on the split form); one more | oot-decomp src/audio/internal/synthesis.c:799 | empty test with an empty else
+src/tlb/tlb_0038.c | the first test and the next on one line (IDO_NOTES 347) | sm64-decomp src/game/camera.c:4290 | two statements on one line
+src/tlb/tlb_0040.c | frame words | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[4])
+src/tlb/tlb_0041.c |  | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare), kabukiMainProc
+src/tlb/tlb_0041.c | words of the game's frame | oot-decomp src/code/z_lights.c:379 | unused pad local in a block (s32 pad[10])
+src/tlb/tlb_0041.c |  | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare), kabukiKageProc
+src/tlb/tlb_0042.c | a frame word (the game's eighth word above case 11's p); unused | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0042.c | the game has one more word above m | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0042.c | the first test and the next on one line (IDO_NOTES 347) | sm64-decomp src/game/camera.c:4290 | two statements on one line
+src/tlb/tlb_0042.c | one more use of o gives it a saved register (s1), as the game | oot-decomp src/overlays/actors/ovl_Bg_Spot16_Bombstone/z_bg_spot16_bombstone.c:463 | empty test of a pointer
+src/tlb/tlb_0048.c | b's address taken keeps it in its home (0x28), as the game | oot-decomp src/code/db_camera.c:1300 | empty test of an address
+src/tlb/tlb_0048.c | an empty test; one more use of ex and ez, after the sqrt, so | oot-decomp src/code/fault_n64.c:471 | empty test of an arithmetic value
+src/tlb/tlb_0048.c | c's address taken keeps its store (it was volatile) | oot-decomp src/code/db_camera.c:1300 | empty test of an address
+src/tlb/tlb_0053.c | an unused word at the top of the frame (a local the game never kept) | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad), obj22Falls22VProc
+src/tlb/tlb_0053.c | an unused word at the top of the frame (a local the game never kept) | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad), obj22Falls22RProc
+src/tlb/tlb_0053.c | an unused word between s and c | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad2)
+src/tlb/tlb_0062.c | empty, as in the game (it tests arg and branches past nothing) | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0071.c | arg's address taken keeps it in its home, as the game has | fzerox-decomp src/overlays/course_edit/1A2D70.c:40 | empty test of a parameter's address
+src/tlb/tlb_0079.c |  | oot-decomp src/overlays/actors/ovl_En_Fd/z_en_fd.c:815 | empty test of a field, sirobzStepPost
+src/tlb/tlb_0079.c | keeps obj live from the top (found by empties) | oot-decomp src/overlays/actors/ovl_Bg_Spot16_Bombstone/z_bg_spot16_bombstone.c:463 | empty test of a pointer
+src/tlb/tlb_0079.c |  | oot-decomp src/overlays/actors/ovl_En_Fd/z_en_fd.c:815 | empty test of a field, sirobzStepDrop
+src/tlb/tlb_0080.c | a 0.0 use in this block and one block more in cur's span (see above). | oot-decomp src/audio/internal/synthesis.c:799 | empty test with an empty else
+src/tlb/tlb_0081.c | stands for 8 bytes of the game's frame no local of this C fills | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[2])
+src/tlb/tlb_0099.c | keeps w a pointer (unfolded into obj's offsets), as the game | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0099.c | keeps w a pointer (unfolded into obj's offsets) and spends t6, as the game | oot-decomp src/code/sys_matrix.c:942 | empty test if (0) {}
+src/tlb/tlb_0102.c | a block around the setup (OoT's `if (1) {` spelling; a do-while(0) is the same | oot-decomp src/code/z_actor.c:3701 | if (1) { } block around statements
+src/tlb/tlb_0102.c | the empty test keeps w in its own register (addiu v0,a0,0x20; 0x44(v0)) as the | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0105.c | the pads sweep's | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0105.c | an empty test (the permuter's find); IDO_NOTES 378 E5 | sm64-decomp src/game/paintings.c:688 | empty test (NULL compare)
+src/tlb/tlb_0111.c | frame word; with y and near, the game's slots | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad0[1])
+src/tlb/tlb_0111.c | frame word; with done, the game's frame 0x68 | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad0)
+src/tlb/tlb_0129.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad2), obisu_maru_proc
+src/tlb/tlb_0129.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad3), obisu_maru_proc
+src/tlb/tlb_0129.c |  | oot-decomp src/code/db_camera.c:1655 | unused pad local (pad4[2]), obisu_maru_proc
+src/tlb/tlb_0129.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad5), obisu_maru_proc
+src/tlb/tlb_0129.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad), obisuRunActStep
+src/tlb/tlb_0129.c |  | oot-decomp src/code/z_actor.c:4853 | unused pad local in a block (pad1), obisuRunActStep
+src/tlb/tlb_0131.c | the game's frame word | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0131.c | o's address taken keeps it in its home, reloaded after the calls | fzerox-decomp src/overlays/course_edit/1A2D70.c:40 | empty test of a parameter's address
+src/tlb/tlb_0135.c | two block boundaries (e stays in its home); OoT's `if (1) {}` spelling | oot-decomp src/audio/internal/load.c:1757 | if (1) {} block boundaries, two
+src/tlb/tlb_0138.c | frame words (greedy's pad) | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad_x[6])
+src/tlb/tlb_0138.c | lifts h and the difference above left (left to a0) | oot-decomp src/audio/internal/load.c:2226 | empty test of a local
+src/tlb/tlb_0142.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad2)
+src/tlb/tlb_0142.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad1)
+src/tlb/tlb_0142.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad3)
+src/tlb/tlb_0142.c |  | oot-decomp src/code/db_camera.c:1655 | unused pad local (pad4[2])
+src/tlb/tlb_0142.c |  | oot-decomp src/code/z_actor.c:503 | unused pad local (pad5)
+src/tlb/tlb_0143.c | frame words; the game's pos at 0x4C (the twin nekobusStopProc declares pad[3] above pos) | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[3])
+src/tlb/tlb_0166.c | the game's frame (0xA0), greedy's pads | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad[8])
+src/tlb/tlb_0173.c | an empty test of the frame rate (the permuter's find was an empty if/else, a | oot-decomp src/audio/internal/thread.c:78 | empty test of a global's field
+src/tlb/tlb_0204.c | the game's frame words | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad)
+src/tlb/tlb_0204.c |  | oot-decomp src/code/db_camera.c:1655 | unused pad local (s32 pad2[2])
+src/tlb/tlb_0324_1.c | yaw read once, so its test's branch stays and its store goes (IDO_NOTES 204) | oot-decomp src/code/z_skin_matrix.c:374 | empty test of a float local
+src/tlb/tlb_0324_6.c | puts the abs compares' 0 in $f30 from the prologue (empties) | oot-decomp src/code/z_skin_matrix.c:374 | empty test of a float local
+src/tlb/tlb_0324_6.c | f lives across the sinf calls, so the NULL test takes s0 | oot-decomp src/overlays/actors/ovl_Bg_Spot16_Bombstone/z_bg_spot16_bombstone.c:463 | empty test of a pointer
+src/tlb/tlb_0324_6.c | a block boundary (a compiled-out print?) keeps w out of s0 | oot-decomp src/audio/internal/load.c:1757 | if (1) {} block boundary
+src/tlb/tlb_0324_7.c | a stack word (a removed local's); without it real 25 | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad2)
+src/tlb/tlb_0324_7.c | two empty readers of the sum (IDO_NOTES 204's family). They make it a common value | oot-decomp src/code/fault_n64.c:471 | empty test of an arithmetic value, twice
+src/tlb/tlb_0326_1.c | an empty test: y's range reaches the switch, so the 3-degree double | oot-decomp src/code/z_skin_matrix.c:374 | empty test of a float local
+# 2026-10-17, a second pass. Each precedent opened at its line, live
+# code (no enclosing #if). That the plain form changes the code is measured,
+# or shown in the
+# function's note. The five `if (1) {}` lines were do-while(0)s until that pass (object identical).
+src/beffect.c | starts &gBeFadeShorten's live range above the keep test | oot-decomp src/overlays/actors/ovl_En_Torch2/z_en_torch2.c:498 | empty test of a file-scope variable (if (sAlpha) {})
+src/polygon.c |  | oot-decomp src/code/db_camera.c:1300 | empty test of an address (if (!&f->world) {}), polDrawMani
+src/enecommon.c | the game's eight unused words above view | oot-decomp src/audio/internal/load.c:1271 | unused pad local (s32 pad[8]), futtobi_hahen
+src/impact.c | frame | oot-decomp src/code/fault_n64.c:457 | unused pad local (s32 pad[4]), MEGA
+src/audio.c | (permuter): "* 0" re-reads the entry's byte 2 to schedule the loads | oot-decomp src/code/z_draw.c:423 | no-op multiply by zero (0 * (play->state.frames * 0))
+src/font.c | "* 1" | oot-decomp src/code/z_draw.c:423 | no-op multiply by one (1 * (play->state.frames * 1))
+src/sndcmd.c | `count ^ 0` is `count`; it puts the pass test's operands in the original's order. | oot-decomp src/code/z_kankyo.c:1667 | no-op xor in a test (isOffScreen ^ 0), sndCmdLoopEnd
+src/sndcmd.c | `count ^ 0` is `count`; it puts the pass test's operands in the original's order. | oot-decomp src/code/z_kankyo.c:1714 | no-op xor in a test (isOffScreen ^ 0), sndCmdLoop2End
+src/gameproc.c | a second read-back | oot-decomp src/overlays/misc/ovl_kaleido_scope/z_kaleido_item.c:686 | an element copied from its neighbour (cButtonSlots[1] = cButtonSlots[0])
+# Kept fakematches, decided 2026-10-17 ("Stop now and keep them"). After the natural pass,
+# these 27 marks match the game, but no natural C for them was found by IDA, matched code, 15 other
+# decomps or the natural-only permuter. Each stays marked, as OoT keeps its own fakematches
+# (z_kankyo.c:289 `//! FAKE:`, z_bgcheck.c:3001). Each one's measured natural forms are
+# recorded.
+# report_progress.py counts these apart from the cited kinds (fourth column "fakematch").
+src/cockpit.c | the boss read as a u32 for the sky's tests (msg 3). Read plainly, IDO sees the same load | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):cockpitProc, uopt PRE on gBattleBossId
+src/eneproc.c | the enemy's velocity read as a Vec3f (vel.x, vel.y, vel.z). EneObj declares it f32 | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):VEL, IDO's operand sort for constant-index elements (wave4_types K1)
+src/font.c | a dead store (c is read again only after the step) | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):frmFontDrawText, uopt copy propagation
+src/scenario.c | an address-only use of w (eight references, no code) raises its priority. | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):scRun_proc2
+src/scenario.c | never true (unsigned). ugen computes obj + 1 into the original's spent | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):scRun_proc2, ugen's dead addu
+src/sndloc.c | keeps the load of a at done a ugen temp (t8), as in the game | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):soundScoreKeyCheck, uopt PRE
+src/tlb/tlb_0037.c | a dead store (dx is set again before every read); it makes eneNewPol's address the | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):ihandpointProc, spill-slot order
+src/tlb/tlb_0102.c | "^ 0" keeps PL(p) in a register as the game has it | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):transferSquashPlayers
+src/tlb/tlb_0102.c | puts pw in v0 as the game has it (a dead decrement; pltalk.c's twin loop, plTalkSetOthersH | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):transferSquashPlayers
+src/tlb/tlb_0109.c | a never-true unsigned test (IDO_NOTES 284) puts a block boundary after w's | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):shopYadoya_proc, an as1 block boundary
+src/tlb/tlb_0111.c | the height read as a Vec3f field (IDO_NOTES 198, as eneproc.c's VEL): as the | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):gasyaHalt, cfe's operand sort
+src/tlb/tlb_0131.c | c set again in the branch. The first set (above) gives c its | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):hanashot_proc, ugen's .noalias
+src/tlb/tlb_0135.c | one source line (as1 orders hoisted instructions by .loc line, see the note) | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):karasuTenguProc's charge test, as1's .loc tie-break
+src/tlb/tlb_0140.c | the (s8) cast and the double shift stand for three ugen temporaries the game | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):DtskHikyaku_proc, ugen's temp FIFO
+src/tlb/tlb_0177.c | the (f32) casts (no-ops) put each random first in its sum, as the game adds | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):monoeyeMain0, add.s operand order
+src/tlb/tlb_0324_4.c | keeps roll live into this arm (constrained, f0) | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):btaiBank, uopt colouring
+src/tlb/tlb_0324_6.c | angle carries a->scale's chain so the never-true test below can read it | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):btaiIkasumiProc
+src/tlb/tlb_0324_6.c | a never-true unsigned test (IDO_NOTES 284, shopYadoya_proc's lever). Its 14 | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):btaiIkasumiProc
+src/tlb/tlb_0326_1.c | the pads sweep's | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):bkasKpaperProc's frame pad
+src/tlb/tlb_0326_1.c | never false (unsigned) -- ugen spends t7 on w + 1 and its | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):bkasKpaperProc, ugen's dead loads
+src/tlb/tlb_0326_1.c | never true; spends one ugen t-register (case 2's 3 takes the | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):bkasKpaperProc
+src/tlb/tlb_0326_1.c | the result through r and a never-true test after the call: the load and | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):bkasKpaperProc
+src/tlb/tlb_0327_0.c | create's bossSetFrameFlags2(w->ghost[1], 0x20) called as returning s32 (its result | oot-decomp src/code/z_kankyo.c:289 | fakematch kept (no natural form found, 2026-10-17):Bdev_proc, a uopt colouring tie
+src/tlb/tlb_0018_4.c | a second read-back, as gameproc.c case 7 | oot-decomp src/overlays/misc/ovl_kaleido_scope/z_kaleido_item.c:686 | an element copied from its neighbour, as game_proc sets the same fade colour (titleStepIntro; it replaced a 64-bit mask)
+src/bmove.c | OoT's `if (1) {}`, a block boundary (splits): max spilled across the calls | oot-decomp src/code/z_actor.c:3264 | if (1) {} block boundary, bossFlyToward
+src/cockpit.c | OoT's `if (1) {}`, twice: block boundaries (no code) inside the FileSet temp's | oot-decomp src/code/z_actor.c:3264 | if (1) {} block boundaries, two, cockpitProc
+src/polygon.c | OoT's `if (1) {}`, seven: empty blocks where gfx is live and f is not | oot-decomp src/code/z_actor.c:3264 | if (1) {} block boundaries, seven, polDrawMani
+src/vram.c | OoT's `if (1) {}`, a block boundary after the initialisers (IDO_NOTES 228) | oot-decomp src/code/z_actor.c:3264 | if (1) {} block boundary, vramRayGround
+src/zanzou.c | OoT's `if (1) {}`, a block boundary at the head of this path (see the note) | oot-decomp src/code/z_actor.c:3264 | if (1) {} block boundary, zanzouLayTrack
+src/tlb/tlb_0040.c | OoT's frame pad, the game's 4th word of locals (homes 16; without it 12) | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad), oniFightDoorProc
+src/tlb/tlb_0051.c | OoT's frame pad, the game's 11th word of locals (homes 44; without it 40) | oot-decomp src/code/z_actor.c:503 | unused pad local (s32 pad), wsSoundProc
+src/tlb/tlb_0103.c | three spellings of zero, so IDO keeps them apart (IDO_NOTES 365) | oot-decomp src/overlays/actors/ovl_Object_Kankyo/z_object_kankyo.c:342 | equal float literals spelled apart (0.0f, 0.00f, 0.000f); one spelling: real 13 (wave3_b)
+src/tlb/tlb_0135.c | 0.9, spelled apart (IDO_NOTES 365) | oot-decomp src/overlays/actors/ovl_Object_Kankyo/z_object_kankyo.c:342 | equal float literals spelled apart (0.90 by the function's 0.9); plain 0.9: real 926 (wave3_b, line 561)
+src/tlb/tlb_0135.c | 0.9, spelled apart (IDO_NOTES 365) | oot-decomp src/overlays/actors/ovl_Object_Kankyo/z_object_kankyo.c:342 | equal float literals spelled apart (0.90 by the function's 0.9); plain 0.9: real 1036 (wave3_b, line 655)
+src/tlb/tlb_0135.c | spelling (IDO_NOTES 365), as state 2's: a ugen load | oot-decomp src/overlays/actors/ovl_Object_Kankyo/z_object_kankyo.c:342 | equal float literals spelled apart (0.90 by the function's 0.9); plain 0.9: real 784 (wave3_b, line 763)
+src/tlb/tlb_0325_1.c | a compiled-out print stood here (see bfriKnockedBack); OoT/MM's `if (1) {}`. | oot-decomp src/code/z_actor.c:3264 | if (1) {} for a compiled-out print, bfriStraightHit (MM z_skelanime.c's "Debug prints here, required to match"); no block: the w->frame reload goes (wave4_search #250)
+src/tlb/tlb_0325_1.c | a compiled-out print stood here (see bfriKnockedBack); OoT/MM's `if (1) {}`. | oot-decomp src/code/z_actor.c:3264 | if (1) {} for a compiled-out print, bfriBrotherAttackHit (wave4_search #252)
+src/tlb/tlb_0325_1.c | a compiled-out print stood here, written as OoT/MM's `if (1) {}` (MM's | oot-decomp src/code/z_actor.c:3264 | if (1) {} for a compiled-out print, bfriKnockedBack; without it 42 lines differ (wave4_search #254)
+src/tmanager.c | the original tests -1 twice (beq, then bnel), as two names for -1 would; one test | perfect_dark-decomp src/game/chraction.c:14365 | the same equality tested twice, `chrnum == CHR_BOND || chrnum == CHR_BOND`; one test or a switch gives a single bne (wave3_d, wave4_search)
+include/symbol_pad.h | BSS REORDER PADDING, the kind F-Zero X keeps (src/overlays/ending/ending.c:53). | fzerox-decomp src/overlays/ending/ending.c:53 | .bss reorder padding: 146 unused static declarations take the symbol numbers the game spent (IDO 7.1 at -g0, F-Zero X's own compiler and flags); no order of the real declarations reaches the wrap
+# Caller-side declarations that do not agree with the definition (2026-10-17; the measurements are
+# recorded). Each: with the definition's type the file's object differs or it
+# does not compile (dr_cc against build/), and the definition's own type is proven too (the
+# definition given the caller's type differs, or another caller needs the definition's). The
+# precedent keeps the same kind in its matching build: a caller's prototype that disagrees with the
+# definition, or a local prototype kept where the header is not included.
+src/aniatk.c | file.h is not included here: fileRamAddrAt: the game's code calls it as this file declares it | perfect_dark-decomp src/lib/main.c:75 | a caller's prototype with another parameter type than the definition ("an incorrect declaration is needed", main.c:72-73; rng_c.c:24 takes a u64): fileRamAddrAt(s32 file), defined u32 file (sndloc.c needs the u32, this file the s32)
+src/aniatk.c | in no header: src/aniatk.c includes acoll.h already and used here as this file declares it (The number of arguments | oot-decomp src/code/fault_gc.c:377 | a caller's prototype with fewer parameters than the definition (padmgr.c:436; padmgr.h:47-51 leaves it out of the header for that caller): _atkLinkAdd called with 15, defined with 16, acoll.c's own calls pass 16
+src/brother.c | joypad.h is not included here: see joyGetStickX | sm64-decomp lib/src/osCreateViManager.c:14 | a local prototype of a function another header declares (lib/src/osint.h:46), that header not included: joyGetHeldTime, as joypad.h's joyGetStickX disagrees with this file's
+src/brother.c | joypad.h is not included here: joyGetStickX: the game's code calls it as this file declares it | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's prototype with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): joyGetStickX read as s32, defined s8 (camera.c and tlb_0078 need the s8)
+src/dma.c | gfxbuf.h is not included here: gfxStartBuffer: used here as this file declares it (The number of arguments | oot-decomp src/code/fault_gc.c:377 | a caller's prototype with fewer parameters than the definition: gfxStartBuffer called with none, its definition reads i (idat 800D05E0)
+src/pakfiler.c | in no header: src/pakfiler.c includes contpak.h already and used here as this file declares it | perfect_dark-decomp include/PR/os_libc.h:89 | the callers' declaration returns a value the matching definition does not (sprintf: int here, void at src/lib/ultra/libc/sprintf.c:26; note at :12-18, the value left in v0): contPakDeleteFile is void (an s32 return changes contpak.c's .text)
+src/plmove.c | in no header: used here as this file declares it (The number of arguments doesn't agree | oot-decomp src/overlays/misc/ovl_kaleido_scope/z_kaleido_equipment.c:173 | a caller's prototype with more parameters than the definition ("Wrong prototype"; z_kaleido_scope.c:965 takes none): ridePointIn called with 4, defined with 3 (a fourth parameter changes ride.c's code)
+src/scenario.c | in no header: used here as this file declares it (The number of arguments doesn't agree | oot-decomp src/code/fault_gc.c:377 | a caller's prototype with fewer parameters than the definition: strCreate called with none, its definition passes parent to tskCreate (idat 800E9950)
+src/stubs.c | tmanager.h is not included here: tskDefaultProc: used here as this file declares it (The number | oot-decomp src/code/fault_gc.c:377 | a caller's prototype with fewer parameters than the definition: tskDefaultProc called with 2, defined with 3 and reading them (idat 800D40FC); tmanager.h's other users pass 3
+src/zanzou.c | plmain.h is not included here: see plIsInPlay | sm64-decomp lib/src/osCreateViManager.c:14 | a local prototype of a function another header declares (lib/src/osint.h:46), that header not included: plGetModelPos, as plmain.h's plIsInPlay disagrees with this file's
+src/zanzou.c | plmain.h is not included here: plIsInPlay: the game's code calls it as this file declares it | perfect_dark-decomp src/lib/naudio/n_csplayer.c:491 | a caller's prototype with a u8 parameter where the definition takes 32 bits (snd.c:1888): plIsInPlay(u8), defined s32 (its i < 0 test; a u8 definition changes plmain.c)
+src/zanzou.c | plmain.h is not included here: see plIsInPlay | sm64-decomp lib/src/osCreateViManager.c:15 | a local prototype of a function another header declares (lib/src/osint.h:20), that header not included: plAskPos, as plmain.h's plIsInPlay disagrees with this file's
+src/ombupl.c | enecommon.h is not included here: eneGetWorldPos: the game's code calls it as this file declares it | perfect_dark-decomp src/lib/main.c:75 | a caller's prototype with another parameter type than the definition ("an incorrect declaration is needed", main.c:73-74; rng_c.c:24 takes a u64): eneGetWorldPos(s32 obj, ...), defined Obj *o; ombupl.c passes Player.hitBy, an s32 (as an s32 definition, person.c, pldefault.c, pltalk.c and tlb_0130.c would pass a pointer as an int; confirmed 2026-10-17)
+# floadGetSetFile read as int-returning by five stage builds (2026-10-17).
+# The definition returns s16 (idat on a copy of 0006_800C7B10.bin.i64, 800CDE6C: `lh $v0` to `jr $ra`);
+# tlb.h:3047 gives every TLB file that view, and 35 of the 66 TLB callers need it (the
+# s32 sweep). These five game frames have no word for a narrow call result's temp (IDO_NOTES 375); idat on
+# copies of 0199/0222/0237/0246/0251: frames 0x50/0x70/0x58/0x58/0x50, v0 straight to vramLoadColl's a1. With
+# the definition's s16 (the bare call) check gives real 6/2/8/8/8 and dr_cc DIFFER; the twin
+# sekisyo2StageBuild (tlb_0221), whose game frame holds the word (0x60), matches with it.
+# The precedent's construct is a file-local prototype. Here cfe refuses one under tlb.h ("redeclaration of
+# 'floadGetSetFile'; previous declaration at line 3047 in file 'include/tlb.h'", "Incompatible function return
+# type"), so this file's view is written at the call. The prototype form (PROVEN WITH HEADER)
+# needs floadGetSetFile out of tlb.h for all its TLB callers; that change was reverted (863).
+src/tlb/tlb_0199.c | called as returning s32. tlb.h has the definition's s16, and a nested call with a | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's view with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): floadGetSetFile called as s32, defined s16; the s16 call gives frame 0x58 for the game's 0x50 (real 6)
+src/tlb/tlb_0222.c | called as returning s32, as in tlb_0199. tlb.h has the definition's s16, and a | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's view with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): floadGetSetFile called as s32, defined s16; the s16 call puts the spill at 0x50 for the game's 0x54 (real 2)
+src/tlb/tlb_0237.c | called as returning s32, as in tlb_0199: tlb.h has the definition's s16, and a | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's view with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): floadGetSetFile called as s32, defined s16; the s16 call gives frame 0x60 for the game's 0x58 (real 8)
+src/tlb/tlb_0246.c | called as returning s32, as in tlb_0199 (the definition's s16 result gets a temp | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's view with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): floadGetSetFile called as s32, defined s16; the s16 call gives frame 0x60 for the game's 0x58 (real 8)
+src/tlb/tlb_0251.c | called as returning s32, as in tlb_0199 (the definition's s16 result gets a temp | perfect_dark-decomp src/lib/ultra/libc/sprintf.c:5 | a caller's view with another return type than the definition (char _Printf; xprintf.c:153 returns int; note at sprintf.c:20-21): floadGetSetFile called as s32, defined s16; the s16 call gives frame 0x58 for the game's 0x50 (real 8)
+# stage.c's three TLB procs (2026-10-17). Each prototype is the one
+# include/tlb/tlb_0018.h declares, word for word; stage.c cannot include that header: it brings tlb.h, whose
+# far-call macros make stage.c's own definitions pointers (measured: "stageBuildDive must have function type").
+src/stage.c | tlb/tlb_0018.h is not included here: it brings tlb.h, whose far-call macros are for the TLB files | sm64-decomp lib/src/osCreateViManager.c:14 | a local prototype of a function another header declares (lib/src/osint.h:46), that header not included: titleProc, as tlb/tlb_0018.h declares it
+src/stage.c | tlb/tlb_0018.h is not included here: it brings tlb.h, whose far-call macros are for the TLB files | sm64-decomp lib/src/osCreateViManager.c:15 | a local prototype of a function another header declares (lib/src/osint.h:20), that header not included: subtProc, as tlb/tlb_0018.h declares it
+src/stage.c | tlb/tlb_0018.h is not included here: it brings tlb.h, whose far-call macros are for the TLB files | sm64-decomp lib/src/osCreateViManager.c:14 | a local prototype of a function another header declares (lib/src/osint.h:46), that header not included: ntegataProc, as tlb/tlb_0018.h declares it

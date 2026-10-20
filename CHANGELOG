@@ -1,0 +1,9 @@
+Goemon's Great Adventure (Nintendo 64) - decompilation changelog
+Newest entry on top.
+
+2026-10-20
+- First public release. Every function and every data block of the US ROM is C that builds to
+  both of the ROM's SHA-1s (the decompressed ROM's and the shipped ROM's), with real names, the
+  assets in real formats (PNG, model and table C, scenario text, audio banks), and one prototype
+  per function in its module's header. canon-decompilation-tools/README.md tells how to build
+  it and what each tool does. Earlier history is kept privately.

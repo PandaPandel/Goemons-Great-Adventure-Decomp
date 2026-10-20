@@ -1,0 +1,4100 @@
+name: Goemons Great Adv (North America)
+# The DECOMPRESSED working ROM (canon-decompilation-tools/nisitenma_archive.py unpack); the final ROM's sha1 is in
+# goemonsgreatadv.us.sha1 and canon-decompilation-tools/build_rom.py checks both.
+sha1: a0db6785e180f41b47f340d12e13ceabcbcc292d
+options:
+  basename: goemonsgreatadv
+  target_path: baserom.us.decompressed.z64
+  elf_path: build/goemonsgreatadv.elf
+  base_path: .
+  platform: n64
+  compiler: IDO
+  # Overlays 8, 9 and 10 share VRAM 0x801738A0: names carry the segment so they cannot collide
+  symbol_name_format: $VRAM_$SEG
+
+  # asm_path: asm
+  # src_path: src
+  # The original's hand-written assembly (the entry point, rspboot) is source: src/<name>.s
+  hasm_in_src_path: True
+  # Every function's asm is written to asm/nonmatchings/, matched or not: match_function.py
+  # check takes the game's code from there, and report_progress.py counts from it
+  disassemble_all: True
+  # build_path: build
+  # create_asm_dependencies: True
+
+  ld_script_path: goemonsgreatadv.ld
+  # libultra's objects, built from lib/ultralib's source by canon-decompilation-tools/build_libultra.py
+  lib_path: build/lib
+  ld_dependencies: True
+
+  find_file_boundaries: True
+  header_encoding: ASCII
+
+  o_as_suffix: True
+  use_legacy_include_asm: False
+  mips_abi_float_regs: o32
+
+  # section_order: [".text", ".data", ".rodata", ".bss"]
+  # auto_link_sections: [".data", ".rodata", ".bss"]
+
+  symbol_addrs_path:
+    - symbol_addrs.txt
+  reloc_addrs_path:
+    - reloc_addrs.txt
+
+  # undefined_funcs_auto_path: undefined_funcs_auto.txt
+  # undefined_syms_auto_path: undefined_syms_auto.txt
+
+  extensions_path: tools/splat_ext
+
+  # string_encoding: ASCII
+  # data_string_encoding: ASCII
+  rodata_string_guesser_level: 2
+  data_string_guesser_level: 2
+  # libultra_symbols: True
+  # hardware_regs: True
+  # gfx_ucode: # one of [f3d, f3db, f3dex, f3dexb, f3dex2]
+segments:
+  - name: header
+    type: header
+    start: 0x0
+
+  - name: ipl3
+    type: bin
+    start: 0x40
+
+  - name: entry
+    type: code
+    start: 0x1000
+    vram: 0x80000400
+    subsegments:
+      - [0x1000, hasm, entry]
+
+  - name: main
+    type: code
+    start: 0x1060
+    vram: 0x80000460
+    follows_vram: entry
+    bss_size: 0x88600
+    # Source-file boundaries: splat's suggestions (functions padded with nops to 16 bytes)
+    subsegments:
+      - [0x1060, c, main]
+      - [0x2480, c, dma]
+      - [0x29C0, c, contpak]
+      - [0x3AE0, c, romdecode]
+      - [0x43A0, c, file]
+      - [0x5480, c, sys]
+      - [0x6000, c, heap]
+      - [0x6420, c, pic]
+      - [0x7DB0, c, fileres]
+      - [0x8900, c, audio]
+      - [0xC1D0, c, sndtrack]
+      - [0xDA50, c, sndcmd]
+      # From here to the data, libultra 2.0I and the SDK's audio library. A lib entry is that
+      # ultralib object, compiled from lib/ultralib's source (canon-decompilation-tools/build_libultra.py); asm is what
+      # is not matched yet.
+      - [0xFB20, lib, libultra_rom, os_sendmesg]
+      - [0xFC70, lib, libultra_rom, J_io_pfsfreeblocks]
+      - [0xFE10, lib, libultra_rom, os_recvmesg]
+      - [0xFF50, lib, libultra_rom, os_setintmask]
+      - [0xFFF0, lib, libultra_rom, audio_sl]
+      - [0x100B0, lib, libultra_rom, gu_rotate]
+      - [0x102A0, lib, libultra_rom, gu_scale]
+      - [0x10340, lib, libultra_rom, gu_sinf]
+      - [0x10500, lib, libultra_rom, audio_synsetvol]
+      - [0x105A0, lib, libultra_rom, io_sptask]
+      - [0x10890, lib, libultra_rom, os_maptlb]
+      - [0x10950, lib, libultra_rom, os_exceptasm]
+      - [0x11260, lib, libultra_rom, os_thread]
+      - [0x112A0, lib, libultra_rom, os_destroythread]
+      - [0x113B0, lib, libultra_rom, libc_bzero]
+      - [0x11450, lib, libultra_rom, P_io_leointerrupt]
+      - [0x11B40, lib, libultra_rom, J_io_motor]
+      - [0x11F10, lib, libultra_rom, io_siacs]
+      - [0x11FD0, lib, libultra_rom, os_createthread]
+      - [0x12120, lib, libultra_rom, J_io_contreaddata]
+      - [0x12300, lib, libultra_rom, io_controller]
+      - [0x12640, lib, libultra_rom, gu_align]
+      - [0x12850, lib, libultra_rom, audio_bnkf]
+      - [0x12AA0, lib, libultra_rom, audio_synallocvoice]
+      - [0x12CD0, lib, libultra_rom, os_virtualtophysical]
+      - [0x12D50, lib, libultra_rom, os_writebackdcache]
+      - [0x12DD0, lib, libultra_rom, os_initialize]
+      - [0x13060, lib, libultra_rom, io_pirawread]
+      - [0x130C0, lib, libultra_rom, libc_ll]
+      - [0x13380, lib, libultra_rom, os_parameters]
+      - [0x133E0, lib, libultra_rom, os_setsr]
+      - [0x133F0, lib, libultra_rom, os_getsr]
+      - [0x13400, lib, libultra_rom, audio_synsetfxparam]
+      - [0x13440, lib, libultra_rom, io_vigetnextframebuf]
+      - [0x13480, lib, libultra_rom, audio_synstartvoice]
+      - [0x13510, lib, libultra_rom, gu_perspective]
+      - [0x137A0, lib, libultra_rom, io_sprawdma]
+      - [0x13830, lib, libultra_rom, J_io_sirawdma]
+      - [0x138E0, lib, libultra_rom, io_epilinkhandle]
+      - [0x13930, lib, libultra_rom, io_viblack]
+      - [0x139A0, lib, libultra_rom, io_sirawread]
+      - [0x139F0, lib, libultra_rom, io_sptaskyield]
+      - [0x13A10, lib, libultra_rom, P_io_pfsreadwritefile]
+      - [0x13E60, lib, libultra_rom, gu_mtxutil]
+      - [0x140D0, lib, libultra_rom, io_visetmode]
+      - [0x14140, lib, libultra_rom, gu_lookat]
+      - [0x14470, lib, libultra_rom, J_io_pfsallocatefile]
+      - [0x148F0, lib, libultra_rom, audio_synsetpitch]
+      - [0x14980, lib, libultra_rom, os_probetlb]
+      - [0x14A40, lib, libultra_rom, audio_synsetpan]
+      - [0x14AD0, lib, libultra_rom, P_io_contpfs]
+      - [0x15650, lib, libultra_rom, os_getcount]
+      - [0x15660, lib, libultra_rom, gu_lookatref]
+      - [0x15AF0, lib, libultra_rom, P_io_pfssearchfile]
+      - [0x15CA0, lib, libultra_rom, audio_synthesizer]
+      - [0x16380, lib, libultra_rom, audio_drvrnew]
+      - [0x16B20, lib, libultra_rom, audio_mainbus]
+      - [0x16C70, lib, libultra_rom, audio_reverb]
+      - [0x178C0, lib, libultra_rom, audio_auxbus]
+      - [0x179D0, lib, libultra_rom, audio_env]
+      - [0x18630, lib, libultra_rom, audio_resample]
+      - [0x18930, lib, libultra_rom, audio_load]
+      - [0x19480, lib, libultra_rom, P_io_pimgr]
+      - [0x19670, lib, libultra_rom, io_piacs]
+      - [0x19730, pad]  # 16 bytes of zeros between two objects, not a function
+      - [0x19740, lib, libultra_rom, io_devmgr]
+      - [0x19BD0, lib, libultra_rom, io_pirawdma]
+      - [0x19CB0, lib, libultra_rom, os_seteventmesg]
+      - [0x19D20, lib, libultra_rom, gu_sqrtf]
+      - [0x19D30, lib, libultra_rom, os_afterprenmi]
+      - [0x19D50, lib, libultra_rom, gu_mtxcatf]
+      - [0x19F60, lib, libultra_rom, io_contquery]
+      - [0x1A010, lib, libultra_rom, gu_lookathil]
+      - [0x1A800, lib, libultra_rom, libc_syncprintf]
+      - [0x1A840, lib, libultra_rom, audio_filter]
+      - [0x1A860, lib, libultra_rom, libc_sprintf]
+      - [0x1A8E0, lib, libultra_rom, libc_xprintf]
+      - [0x1B5A0, lib, libultra_rom, os_unmaptlball]
+      - [0x1B5F0, lib, libultra_rom, io_epidma]
+      - [0x1B6D0, lib, libultra_rom, audio_heapinit]
+      - [0x1B710, lib, libultra_rom, P_io_leodiskinit]
+      - [0x1B7B0, lib, libultra_rom, libc_string]
+      - [0x1B850, lib, libultra_rom, os_createmesgqueue]
+      - [0x1B880, lib, libultra_rom, os_invalicache]
+      - [0x1B900, lib, libultra_rom, os_invaldcache]
+      - [0x1B9B0, lib, libultra_rom, audio_synsetfxmix]
+      - [0x1BA50, lib, libultra_rom, audio_save]
+      - [0x1BB10, lib, libultra_rom, J_io_pfsrepairid]
+      - [0x1BB70, lib, libultra_rom, audio_syngetfxref]
+      - [0x1BBF0, lib, libultra_rom, io_sp]
+      - [0x1BC20, lib, libultra_rom, io_si]
+      - [0x1BC50, lib, libultra_rom, gu_translate]
+      - [0x1BCF0, lib, libultra_rom, os_jammesg]
+      - [0x1BE40, lib, libultra_rom, os_setthreadpri]
+      - [0x1BF20, lib, libultra_rom, os_getthreadpri]
+      - [0x1BF40, lib, libultra_rom, io_viswapbuf]
+      - [0x1BF90, lib, libultra_rom, gu_position]
+      - [0x1C1B0, lib, libultra_rom, io_epirawdma]
+      - [0x1C3E0, lib, libultra_rom, io_sptaskyielded]
+      - [0x1C460, lib, libultra_rom, libc_bcmp]
+      - [0x1C580, lib, libultra_rom, os_gettime]
+      - [0x1C610, lib, libultra_rom, os_timerintr]
+      - [0x1CA10, lib, libultra_rom, os_setglobalintmask]
+      - [0x1CA60, lib, libultra_rom, io_aisetfreq]
+      - [0x1CBC0, lib, libultra_rom, gu_normalize]
+      - [0x1CC50, lib, libultra_rom, os_setcompare]
+      - [0x1CC60, lib, libultra_rom, libc_bcopy]
+      - [0x1CF70, lib, libultra_rom, audio_copy]
+      - [0x1CFF0, lib, libultra_rom, os_resetglobalintmask]
+      - [0x1D050, lib, libultra_rom, J_io_pfsdeletefile]
+      - [0x1D2C0, lib, libultra_rom, gu_ortho]
+      - [0x1D480, lib, libultra_rom, os_interrupt]
+      - [0x1D4C0, lib, libultra_rom, io_vi]
+      - [0x1D600, lib, libultra_rom, J_io_viswapcontext]
+      - [0x1D900, lib, libultra_rom, io_pigetcmdq]
+      - [0x1D930, lib, libultra_rom, gu_cosf]
+      - [0x1DAA0, lib, libultra_rom, io_visetspecial]
+      - [0x1DC60, lib, libultra_rom, io_visetevent]
+      - [0x1DCD0, lib, libultra_rom, audio_synaddplayer]
+      - [0x1DD20, lib, libultra_rom, P_io_pfsnumfiles]
+      - [0x1DE40, lib, libultra_rom, io_cartrominit]
+      - [0x1DF40, lib, libultra_rom, J_io_pfsselectbank]
+      - [0x1DFC0, lib, libultra_rom, os_setfpccsr]
+      - [0x1DFD0, lib, libultra_rom, P_io_pfsfilestate]
+      - [0x1E1B0, lib, libultra_rom, P_io_pfsinitpak]
+      - [0x1E3A0, lib, libultra_rom, J_io_pfsgetstatus]
+      - [0x1E5D0, lib, libultra_rom, P_io_pfschecker]
+      - [0x1EF70, lib, libultra_rom, io_pfsisplug]
+      - [0x1F2B0, lib, libultra_rom, io_aigetlen]
+      - [0x1F2C0, lib, libultra_rom, io_epirawread]
+      - [0x1F460, lib, libultra_rom, os_maptlbrdb]
+      - [0x1F4C0, lib, libultra_rom, os_yieldthread]
+      - [0x1F510, lib, libultra_rom, audio_synstartvoiceparam]
+      - [0x1F600, lib, libultra_rom, J_io_contramwrite]
+      - [0x1F850, lib, libultra_rom, J_io_contramread]
+      - [0x1FA80, lib, libultra_rom, J_io_crc]
+      - [0x1FBF0, lib, libultra_rom, io_epirawwrite]
+      - [0x1FD80, lib, libultra_rom, os_settimer]
+      - [0x1FE60, lib, libultra_rom, libc_xldtob]
+      - [0x20920, lib, libultra_rom, libc_ldiv]
+      - [0x20AB0, lib, libultra_rom, libc_xlitob]
+      - [0x20D50, lib, libultra_rom, io_sirawwrite]
+      - [0x20DA0, lib, libultra_rom, io_spsetstat]
+      - [0x20DB0, lib, libultra_rom, io_spgetstat]
+      - [0x20DC0, lib, libultra_rom, J_io_vimgr]
+      - [0x210D0, lib, libultra_rom, io_vigetcurrcontext]
+      - [0x210E0, lib, libultra_rom, os_writebackdcacheall]
+      - [0x21110, lib, libultra_rom, audio_heapalloc]
+      - [0x21170, lib, libultra_rom, io_pfsinit]
+      - [0x21230, lib, libultra_rom, os_startthread]
+      - [0x21380, lib, libultra_rom, io_visetyscale]
+      - [0x213E0, lib, libultra_rom, audio_synallocfx]
+      - [0x21480, lib, libultra_rom, audio_synstopvoice]
+      - [0x21500, lib, libultra_rom, audio_syndelete]
+      - [0x21510, lib, libultra_rom, io_aisetnextbuf]
+      - [0x215C0, lib, libultra_rom, io_ai]
+      - [0x215F0, lib, libultra_rom, io_vigetcurrframebuf]
+      - [0x21630, lib, libultra_rom, io_spsetpc]
+      # zlib 1.1.3's inflate side, compiled from lib/zlib's upstream source (canon-decompilation-tools/build_zlib.py)
+      - [0x21670, lib, libz, inflate]
+      - [0x22110, lib, libz, infblock]
+      - [0x232C0, lib, libz, infutil]
+      - [0x23470, lib, libz, zutil]
+      - [0x234E0, lib, libz, adler32]
+      - [0x236B0, lib, libz, inftrees]
+      - [0x240B0, lib, libz, infcodes]
+      - [0x24B50, lib, libz, inffast]
+      - [0x25070, hasm, rspboot] # libultra's RSP boot microcode (0xD0 bytes), RSP source
+      # RSP microcode text, in .text after rspboot (named binaries; their data halves are ROM 0x3F230 and 0x3F650)
+      - { start: 0x25140, type: textbin, use_src_path: True, name: rsp/gspF3DEX2_fifo } # F3DEX2 fifo 2.04 text, 0x1390
+      - { start: 0x264D0, type: textbin, use_src_path: True, name: rsp/aspMain }        # aspMain (audio) text, 0xE20
+      # main .data, one piece per C file in link order (dma.c has none)
+      - [0x272F0, .data, main]     # 0x10
+      - [0x27300, .data, contpak]  # 0x20
+      - [0x27320, .data, file]     # 0x112A0
+      - [0x385C0, .data, sys]      # 0x230
+      - [0x387F0, .data, heap]     # 0x10
+      - [0x38800, .data, pic]      # 0x10
+      - [0x38810, .data, fileres]  # 0x10
+      - [0x38820, .data, audio]    # 0x670
+      - [0x38E90, .data, sndtrack] # 0x2B0
+      - [0x39140, .data, sndcmd]   # 0x20C0
+      - [0x3B200, lib, libultra_rom, audio_sl, .data]
+      - [0x3B210, lib, libultra_rom, os_exceptasm, .data]
+      - [0x3B230, lib, libultra_rom, os_thread, .data]
+      - [0x3B250, lib, libultra_rom, io_siacs, .data]
+      - [0x3B260, lib, libultra_rom, io_controller, .data]
+      - [0x3B270, lib, libultra_rom, os_initialize, .data]
+      - [0x3B290, lib, libultra_rom, J_io_vitbl, .data] # libultra 2.0J io/vitbl.c: osViModeTable, 56 OSViModes x 0x50
+      - [0x3C410, lib, libultra_rom, P_io_contpfs, .data]
+      - [0x3C420, lib, libultra_rom, audio_drvrnew, .data]
+      - [0x3C5B0, lib, libultra_rom, audio_env, .data]
+      - [0x3C6F0, lib, libultra_rom, P_io_pimgr, .data]
+      - [0x3C720, lib, libultra_rom, io_piacs, .data]
+      - [0x3C730, lib, libultra_rom, libc_xprintf, .data]
+      - [0x3C780, lib, libultra_rom, os_timerintr, .data]
+      - [0x3C790, lib, libultra_rom, io_vi, .data]
+      - [0x3C800, lib, libultra_rom, vimodes_vimodepallan1, .data]
+      - [0x3C850, lib, libultra_rom, vimodes_vimodentsclan1, .data]
+      - [0x3C8A0, lib, libultra_rom, vimodes_vimodempallan1, .data]
+      - [0x3C8F0, lib, libultra_rom, J_io_contramread, .data]
+      - [0x3C900, lib, libultra_rom, libc_xlitob, .data]
+      - [0x3C930, lib, libultra_rom, J_io_vimgr, .data]
+      - [0x3C950, lib, libultra_rom, io_aisetnextbuf, .data]
+      # A library .rodata piece is linked with the .data entries (linker_section_order), since
+      # splat's linker script puts a segment's .data before its .rodata.
+      - [0x3C960, lib, libz, infutil, .data]
+      - [0x3C9B0, lib, libz, zutil, .data]
+      - [0x3C9E0, lib, libz, inftrees, .data]
+      # main's own .rodata: each C file's strings (most are compiled-out debug prints), linked
+      # with the .data entries as audio.c's jump table below. dma.c and sys.c have none.
+      - { start: 0x3DAF0, type: .rodata, name: main, linker_section_order: .data }
+      - { start: 0x3DB80, type: .rodata, name: contpak, linker_section_order: .data }
+      - { start: 0x3DDD0, type: .rodata, name: romdecode, linker_section_order: .data }
+      - { start: 0x3DF00, type: .rodata, name: file, linker_section_order: .data }
+      - { start: 0x3E280, type: .rodata, name: heap, linker_section_order: .data }
+      - { start: 0x3E320, type: .rodata, name: pic, linker_section_order: .data }
+      - { start: 0x3E450, type: .rodata, name: fileres, linker_section_order: .data }
+      # audio.c's jump table, the last of main's own rodata
+      - { start: 0x3E7D0, type: .rodata, name: audio, linker_section_order: .data }
+      - { start: 0x3E7F0, type: lib, name: libultra_rom, object: os_setintmask, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E870, type: lib, name: libultra_rom, object: gu_rotate, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E880, type: lib, name: libultra_rom, object: gu_sinf, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E8D0, type: lib, name: libultra_rom, object: os_exceptasm, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E920, type: lib, name: libultra_rom, object: gu_align, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E930, type: lib, name: libultra_rom, object: gu_perspective, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E940, type: lib, name: libultra_rom, object: audio_synthesizer, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E950, type: lib, name: libultra_rom, object: audio_drvrnew, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E970, type: lib, name: libultra_rom, object: audio_reverb, section: .rodata, linker_section_order: .data }
+      - { start: 0x3E9A0, type: lib, name: libultra_rom, object: audio_env, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EA00, type: lib, name: libultra_rom, object: audio_resample, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EA40, type: lib, name: libultra_rom, object: io_devmgr, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EA60, type: lib, name: libultra_rom, object: gu_lookathil, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EA70, type: lib, name: libultra_rom, object: libc_xprintf, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EB70, type: lib, name: libultra_rom, object: gu_position, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EB80, type: lib, name: libultra_rom, object: gu_cosf, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EBD0, type: lib, name: libultra_rom, object: gu_libm_vals, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EBE0, type: lib, name: libultra_rom, object: libc_xldtob, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EC40, type: lib, name: libz, object: inflate, section: .rodata, linker_section_order: .data }
+      - { start: 0x3ED00, type: lib, name: libz, object: infblock, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EDF0, type: lib, name: libz, object: zutil, section: .rodata, linker_section_order: .data }
+      - { start: 0x3EE80, type: lib, name: libz, object: inftrees, section: .rodata, linker_section_order: .data }
+      - { start: 0x3F190, type: lib, name: libz, object: infcodes, section: .rodata, linker_section_order: .data }
+      - { start: 0x3F1F0, type: lib, name: libz, object: inffast, section: .rodata, linker_section_order: .data }
+      # RSP microcode data (DMEM images), the last of main; same names as their text halves at 0x25140
+      - { start: 0x3F230, type: rodatabin, use_src_path: True, name: rsp/gspF3DEX2_fifo, linker_section_order: .data } # F3DEX2 fifo 2.04 data, 0x420
+      - { start: 0x3F650, type: rodatabin, use_src_path: True, name: rsp/aspMain, linker_section_order: .data }        # aspMain (audio) data, 0x2C0
+      - { type: bss, vram: 0x8003ED10, name: 8003ED10 }
+      # audio.c defines its own .bss (as1 shares a lui only for symbols the file defines).
+      - { type: .bss, vram: 0x800C3380, name: audio }
+      - { type: bss, vram: 0x800C3400, name: 800C3400 }
+      - { type: lib, vram: 0x800C3730, name: libultra_rom, object: gu_rotate, section: .bss }
+      - { type: lib, vram: 0x800C3740, name: libultra_rom, object: io_sptask, section: .bss }
+      - { type: lib, vram: 0x800C3780, name: libultra_rom, object: P_io_leointerrupt, section: .bss }
+      - { type: lib, vram: 0x800C4780, name: libultra_rom, object: J_io_motor, section: .bss }
+      - { type: lib, vram: 0x800C4880, name: libultra_rom, object: io_siacs, section: .bss }
+      - { type: lib, vram: 0x800C48A0, name: libultra_rom, object: io_controller, section: .bss }
+      - { type: lib, vram: 0x800C4930, name: libultra_rom, object: gu_align, section: .bss }
+      - { type: lib, vram: 0x800C4940, name: libultra_rom, object: os_initialize, section: .bss }
+      - { type: bss, vram: 0x800C4950, name: 800C4950 }
+      - { type: lib, vram: 0x800C4B00, name: libultra_rom, object: P_io_contpfs, section: .bss }
+      - { type: lib, vram: 0x800C4C00, name: libultra_rom, object: P_io_pimgr, section: .bss }
+      - { type: lib, vram: 0x800C5EC0, name: libultra_rom, object: io_piacs, section: .bss }
+      - { type: lib, vram: 0x800C5EE0, name: libultra_rom, object: os_seteventmesg, section: .bss }
+      - { type: lib, vram: 0x800C5F60, name: libultra_rom, object: P_io_leodiskinit, section: .bss }
+      - { type: lib, vram: 0x800C5FE0, name: libultra_rom, object: gu_position, section: .bss }
+      - { type: lib, vram: 0x800C5FF0, name: libultra_rom, object: os_timerintr, section: .bss }
+      - { type: lib, vram: 0x800C6030, name: libultra_rom, object: io_cartrominit, section: .bss }
+      - { type: lib, vram: 0x800C60B0, name: libultra_rom, object: io_pfsisplug, section: .bss }
+      - { type: lib, vram: 0x800C60F0, name: libultra_rom, object: J_io_vimgr, section: .bss }
+      - { type: bss, vram: 0x800C7310, name: 800C7310 }
+
+  # Audio: sound banks, sample tables and sequences (ROM 0x3F910-0x582530)
+  - name: audio
+    type: bin
+    start: 0x3F910
+
+  # The "Nisitenma-Ichigo" files, decompressed (layout: nisitenma.tsv). Offsets below are in the
+  # decompressed working ROM.
+  - name: files_0001
+    type: bin
+    start: 0x582530
+
+  # File 6: the main game overlay, linked right after main's BSS
+  - name: ovl_0006
+    type: code
+    start: 0x582D30
+    vram: 0x800C7B10
+    bss_size: 0x63BE0
+    subsegments:
+      # Source-file boundaries: splat's suggestions (functions padded with nops to 16 bytes)
+      - [0x582D30, c, gameproc]
+      - [0x5831E0, c, stubs]
+      - [0x583230, c, camera]
+      - [0x589000, c, fileload]
+      - [0x589530, c, cache]
+      - [0x5899F0, c, fade]
+      - [0x58B070, c, model]
+      - [0x58B800, c, gfxbuf]
+      - [0x58BA90, c, mathutil]
+      - [0x58EFE0, c, tmanager]
+      - [0x58F7C0, c, gfxmgr]
+      - [0x5906D0, c, anim]
+      - [0x590F90, c, polygon]
+      - [0x592A50, c, camlight]
+      - [0x5934B0, c, ascii]
+      - [0x5938B0, c, joypad]
+      - [0x594470, c, sndloc]
+      - [0x595A70, c, stage]
+      - [0x597FA0, c, gauge]
+      - [0x599F00, c, cambg]
+      - [0x59AB40, c, pause]
+      - [0x59BAF0, c, geography]
+      - [0x59D6F0, c, vram]
+      - [0x59FE00, c, ride]
+      - [0x5A1C20, c, scenario]
+      - [0x5A4230, c, window]
+      - [0x5A4A20, c, string]
+      - [0x5A5370, c, menu]
+      - [0x5A6130, pad] # 0x10 of nops past IDO's alignment of menu.c (0x18 in all)
+      - [0x5A6140, c, font]
+      - [0x5A6D70, c, face]
+      - [0x5A7060, c, swwork]
+      - [0x5A7270, c, msgfrm]
+      - [0x5A8190, c, sccheck]
+      - [0x5A9780, c, tilemap]
+      - [0x5AA9D0, c, attack]
+      - [0x5AABA0, c, acoll]
+      - [0x5ACA30, pad] # 0x10 of nops after acoll.c's last function
+      - [0x5ACA40, c, aniatk]
+      - [0x5AD8E0, c, effect]
+      - [0x5AF6F0, c, itex]
+      - [0x5B05D0, c, particle]
+      - [0x5B2640, c, shadow]
+      - [0x5B28E0, pad]
+      - [0x5B2900, c, zanzou]
+      - [0x5B58D0, .data, sndmusic]  # 0x800FA6B0, 0x3B0
+      - [0x5B5C80, .data, sndse1]    # 0x800FAA60, 0x7460
+      - [0x5BD0E0, .data, sndse2]    # 0x80101EC0, 0x25C0
+      - [0x5BF6A0, .data, sndse3]    # 0x80104480, 0x1990
+      - [0x5C1030, .data, sndse4]    # 0x80105E10, 0x1350
+      - [0x5C2380, .data, sndse5]    # 0x80107160, 0x620
+      - [0x5C29A0, .data, gameproc]  # 0x10
+      - [0x5C29B0, .data, stubs]     # 0x10
+      - [0x5C29C0, .data, camera]    # 0x1A0
+      - [0x5C2B60, .data, fade]
+      - [0x5C2B70, .data, gfxbuf]
+      - [0x5C2B80, .data, drawsetup] # 0x470
+      - [0x5C2FF0, .data, mathutil]  # 0x810
+      - [0x5C3800, .data, tmanager]
+      - [0x5C3880, .data, gfxmgr]
+      - [0x5C3890, .data, polygon]   # 0x320
+      - [0x5C3BB0, .data, camlight]  # 0x140
+      - [0x5C3CF0, .data, ascii]
+      - [0x5C3D70, .data, joypad]
+      - [0x5C3D80, .data, stage]
+      - [0x5C3D90, .data, gauge]     # 0x550
+      - [0x5C42E0, .data, pause]
+      - [0x5C4310, .data, geography] # 0x3D0
+      - [0x5C46E0, .data, vram]
+      - [0x5C4730, .data, ride]      # 0x280
+      - [0x5C49B0, .data, scenario]
+      - [0x5C49C0, .data, window]
+      - [0x5C4A80, .data, string]
+      - [0x5C4AA0, .data, font]      # 0x12B0
+      - [0x5C5D50, .data, face]
+      - [0x5C5ED0, .data, msgfrm]
+      - [0x5C60D0, .data, sccheck]
+      - [0x5C60F0, .data, sctable]   # 0x1290
+      - [0x5C7380, .data, tilemap]
+      - [0x5C73E0, .data, effect]
+      - [0x5C74B0, .data, itex]
+      - [0x5C7800, .data, particle]
+      - [0x5C78C0, .data, shadow]
+      - [0x5C78D0, .data, zanzou]    # to 0x5C7980, where .rodata starts
+      # .rodata from 0x8010C760 ("game_proc"), one piece per source file
+      - [0x5C7980, .rodata, gameproc]
+      - [0x5C79C0, .rodata, camera]
+      - [0x5C7B10, .rodata, cache]
+      - [0x5C7B40, .rodata, fade]
+      - [0x5C7B80, .rodata, model]
+      - [0x5C7B90, .rodata, gfxbuf]
+      - [0x5C7C50, .rodata, mathutil]
+      - [0x5C7CE0, .rodata, tmanager]
+      - [0x5C7E70, .rodata, gfxmgr]
+      - [0x5C81C0, .rodata, anim]
+      - [0x5C81E0, .rodata, polygon]
+      - [0x5C8240, .rodata, camlight]
+      - [0x5C8260, .rodata, ascii]
+      - [0x5C8270, .rodata, joypad]
+      - [0x5C82C0, .rodata, sndloc]
+      - [0x5C8330, .rodata, stage]
+      - [0x5C8470, .rodata, gauge]
+      - [0x5C84C0, .rodata, cambg]
+      - [0x5C8540, .rodata, pause]
+      - [0x5C85C0, .rodata, geography]
+      - [0x5C86E0, .rodata, vram]
+      - [0x5C8990, .rodata, ride]
+      - [0x5C89F0, .rodata, scenario]
+      - [0x5C9120, .rodata, window]
+      - [0x5C9310, .rodata, string]
+      - [0x5C9530, .rodata, menu]
+      - [0x5C9750, .rodata, font]
+      - [0x5C9A00, .rodata, face]
+      - [0x5C9A40, .rodata, swwork]
+      - [0x5C9A80, .rodata, msgfrm]
+      - [0x5C9C50, .rodata, sccheck]
+      - [0x5CA830, .rodata, attack]
+      - [0x5CA8B0, .rodata, acoll]
+      - [0x5CAC10, .rodata, aniatk]
+      - [0x5CAC20, .rodata, effect]
+      - [0x5CAD80, .rodata, itex]
+      - [0x5CADC0, .rodata, particle]
+      - [0x5CAE00, .rodata, shadow]
+      - [0x5CAE20, .rodata, zanzou]
+      # polygon.c defines its .bss (0x80173240-0x8017324B); the rest stays splat's.
+      - { type: bss, vram: 0x8010FCC0, name: 8010FCC0 }
+      - { type: .bss, vram: 0x80173240, name: polygon }
+      - { type: bss, vram: 0x80173250, name: 80173250 }
+
+  # Files 8, 9 and 10 share one slot at 0x801738A0
+  - name: ovl_0008
+    type: code
+    start: 0x5CAEE0
+    vram: 0x801738A0
+    exclusive_ram_id: ovl_801738A0
+    subsegments:
+      - [0x5CAEE0, c, logo]
+      - [0x5CB850, c, pakfiler]
+      # logo.c .data is 0x5CD2B0-0x5D5EB0 (0x80175C70-0x8017E870), after the last jr $ra
+      # (0x80175C60). Its art (3 palettes, 15 CI8 textures) is written to assets/logo/ by the bin
+      # lines and pulled into logo.c by its own GLOBAL_ASM data blocks; the .data lines between
+      # them are logo.c's own C data.
+      - { start: 0x5CD2B0, type: bin, name: logo/gLogoFirstTlut, linker_entry: False } # first logo palette, RGBA16 x256
+      - [0x5CD4B0, .data, logo] # first logo rectangles (2 lists), C
+      - { start: 0x5CE83C, type: bin, name: logo/gLogoFirstTex0, linker_entry: False } # first logo CI8 64x32
+      - { start: 0x5CF03C, type: bin, name: logo/gLogoFirstTex1, linker_entry: False } # first logo CI8 72x24
+      - { start: 0x5CF6FC, type: bin, name: logo/gLogoFirstTex2, linker_entry: False } # first logo CI8 64x32
+      - { start: 0x5CFEFC, type: bin, name: logo/gLogoFirstTex3, linker_entry: False } # first logo CI8 128x16
+      - { start: 0x5D06FC, type: bin, name: logo/gLogoFirstTex4, linker_entry: False } # first logo CI8 64x16
+      - { start: 0x5D0AFC, type: bin, name: logo/gLogoFirstTex5, linker_entry: False } # first logo CI8 128x16
+      - { start: 0x5D12FC, type: bin, name: logo/gLogoSecondTlut, linker_entry: False } # second logo palette, RGBA16 x256
+      - [0x5D14FC, .data, logo] # second logo rectangles, C
+      - { start: 0x5D197C, type: bin, name: logo/gLogoSecondTex0, linker_entry: False } # second logo CI8 32x32
+      - { start: 0x5D1D7C, type: bin, name: logo/gLogoSecondTex1, linker_entry: False } # second logo CI8 128x16
+      - { start: 0x5D257C, type: bin, name: logo/gLogoSecondTex2, linker_entry: False } # second logo CI8 112x16
+      - { start: 0x5D2C7C, type: bin, name: logo/gLogoSecondTex3, linker_entry: False } # second logo CI8 112x16
+      - { start: 0x5D337C, type: bin, name: logo/gLogoSecondTex4, linker_entry: False } # second logo CI8 128x16
+      - { start: 0x5D3B7C, type: bin, name: logo/gLogoSecondTex5, linker_entry: False } # second logo CI8 128x16
+      - { start: 0x5D437C, type: bin, name: logo/gLogoSecondTex6, linker_entry: False } # second logo CI8 128x16
+      - { start: 0x5D4B7C, type: bin, name: logo/gLogoSecondTex7, linker_entry: False } # second logo CI8 128x16
+      - { start: 0x5D537C, type: bin, name: logo/gLogoBackdropTex, linker_entry: False } # backdrop CI8 32x32
+      - { start: 0x5D577C, type: bin, name: logo/gLogoBackdropTlut, linker_entry: False } # backdrop palette, RGBA16 x256
+      - [0x5D597C, .data, logo] # backdrop rectangles, texture tables, state, sprite setup list, C
+      - [0x5D5EB0, .data, pakfiler] # 0x8017E870-0x8017E970: two setup lists, the flag, the Pak character table
+      - [0x5D5FB0, .rodata, logo]
+      - [0x5D5FD0, .rodata, pakfiler]
+
+  - name: ovl_0009
+    type: code
+    start: 0x5D6300
+    vram: 0x801738A0
+    exclusive_ram_id: ovl_801738A0
+    subsegments:
+      # Source-file boundaries: splat's suggestions (functions padded with nops to 16 bytes)
+      - [0x5D6300, c, plchara]
+      - [0x5D6D30, c, plbox]
+      - [0x5D6E30, c, plswing]
+      - [0x5D7C40, c, plchain]
+      # 0x5D7C40 holds three files, told apart by their .rodata (0x617C40 "PL鎖", 0x617CF0
+      # "falldead", 0x617D00 "onigiri"); files start on 16 bytes
+      - [0x5D8F20, c, pllimit]
+      - [0x5D8FA0, c, plonigiri]
+      - [0x5DA8B0, c, demopl]
+      # 0x5DA8B0 is two files, told apart by .rodata (0x617DA0 "demopl.c", 0x617E90 "screw")
+      - [0x5DCD50, c, pldive]
+      - [0x5DEEB0, c, diveef]
+      - [0x5E02A0, c, plbase]
+      - [0x5E0680, c, plhoni]
+      - [0x5E1A20, c, ombupl]
+      - [0x5E3AD0, c, plpick]
+      - [0x5E5270, c, plact]
+      - [0x5E6F80, c, plmodel]
+      - [0x5E7BB0, c, plmsg]
+      - [0x5E83B0, c, plmove]
+      - [0x5EBB20, c, plqueue]
+      - [0x5EBC30, c, plutil]
+      - [0x5ECB90, c, plmain]
+      - [0x5EE1D0, c, managerpl]
+      - [0x5EF110, c, plpush]
+      - [0x5EFA80, c, plsound]
+      - [0x5F04C0, c, pldefault]
+      - [0x5F0770, c, plswim]
+      - [0x5F1130, c, pltalk]
+      - [0x5F1510, pad] # 0x10 of nops after pltalk.c's last function
+      - [0x5F1520, c, plshot]
+      - [0x5F5F00, c, plattack]
+      - [0x5F6B70, c, pl3d]
+      - [0x5F79C0, c, floorhit]
+      - [0x5F8BC0, c, enemy]
+      - [0x5FA450, c, enecommon]
+      - [0x5FD490, c, eneproc]
+      - [0x6014E0, c, person]
+      - [0x602F40, c, shim]
+      - [0x603B40, c, demo]
+      - [0x6058A0, c, pipgauge]
+      - [0x605D80, pad] # 0x10 of nops after pipgauge.c's last function
+      - [0x605D90, c, dmenu]
+      - [0x606B40, c, demotool]
+      - [0x609800, .data, plbox]   # 0x801A6DA0-0x801A71D0, after the last jr $ra (0x801A6D98): the attack per character and action, and the attack files
+      - [0x609C30, .data, plswing] # 0x801A71D0-0x801A71F0: sounds and a voice per character
+      - [0x609C50, .data, plchain] # 0x801A71F0-0x801A7220: the chain start and speed
+      - [0x609C80, .data, plonigiri] # 0x801A7220-0x801A7290, defined in plonigiri.c
+      - [0x609CF0, .data, pldive]    # 0x801A7290-0x801A72B0, defined in pldive.c
+      - [0x609D10, .data, diveef]    # 0x801A72B0-0x801A7300
+      - [0x609D60, .data, plhoni]    # 0x801A7300-0x801A73E0
+      - [0x609E40, .data, ombupl]    # 0x801A73E0-0x801A7640
+      - [0x60A0A0, .data, plpick]    # 0x801A7640-0x801A7670
+      - [0x60A0D0, .data, plact]     # 0x801A7670-0x801A7CF0
+      - [0x60A750, .data, plmodel]   # 0x801A7CF0-0x801A84A0
+      - [0x60AF00, .data, plmsg]     # 0x801A84A0-0x801A84B0
+      - [0x60AF10, .data, plmove]    # 0x801A84B0-0x801A8520
+      - [0x60AF80, .data, plutil]    # 0x801A8520-0x801A8720
+      - [0x60B180, .data, plmain]    # 0x801A8720-0x801A87C0
+      - [0x60B220, .data, plsound]   # 0x801A87C0-0x801A8870
+      - [0x60B2D0, .data, plswim]    # 0x801A8870-0x801A8930
+      - [0x60B390, .data, plshot] # 0x801A8930-0x801A8980, defined in plshot.c
+      - [0x60B3E0, .data, plattack] # 0x801A8980-0x801A8BA0, defined in plattack.c
+      - [0x60B600, .data, plfile] # 0x801A8BA0-0x801A8C60: the characters' file ids and buffer sizes (data only)
+      - [0x60B6C0, .data, plgoemon] # 0x801A8C60-0x801ABB00: Goemon's animation data (data only)
+      - [0x60E560, .data, plebisu] # 0x801ABB00-0x801AE8B0: Ebisumaru's
+      - [0x611310, .data, plsasuke] # 0x801AE8B0-0x801B1600: Sasuke's
+      - [0x614060, .data, plyae] # 0x801B1600-0x801B44D0: Yae's
+      - [0x616F30, .data, pl3d] # 0x801B44D0-0x801B4500
+      - [0x616F60, .data, enemy] # 0x801B4500-0x801B4520
+      - [0x616F80, .data, pipgauge] # 0x801B4520-0x801B45C0
+      - [0x617020, .data, dmenu] # 0x801B45C0-0x801B45D0
+      - [0x617030, .data, demotool] # 0x801B45D0-0x801B5150
+      - [0x617BB0, .rodata, plchara]
+      - [0x617BF0, .rodata, plswing]
+      - [0x617C40, .rodata, plchain]
+      - [0x617CF0, .rodata, pllimit]
+      - [0x617D00, .rodata, plonigiri]
+      - [0x617DA0, .rodata, demopl]
+      - [0x617E90, .rodata, pldive]
+      - [0x617F70, .rodata, diveef]
+      - [0x618050, .rodata, plbase]
+      - [0x618130, .rodata, plhoni]
+      - [0x6181A0, .rodata, ombupl]
+      - [0x618310, .rodata, plpick]
+      - [0x618370, .rodata, plact]
+      - [0x6183E0, .rodata, plmodel]
+      - [0x618540, .rodata, plmsg]
+      - [0x618600, .rodata, plmove]
+      - [0x6186B0, .rodata, plutil]
+      - [0x618710, .rodata, plmain]
+      - [0x618910, .rodata, managerpl]
+      - [0x618A50, .rodata, plpush]
+      - [0x618AB0, .rodata, plsound]
+      - [0x618B10, .rodata, pldefault]
+      - [0x618B20, .rodata, plswim]
+      - [0x618B40, .rodata, pltalk]
+      - [0x618BD0, .rodata, plshot]
+      - [0x618D50, .rodata, plattack]
+      - [0x618DA0, .rodata, pl3d]
+      - [0x618DD0, .rodata, floorhit]
+      - [0x618EE0, .rodata, enemy]
+      - [0x618FC0, .rodata, enecommon]
+      - [0x619290, .rodata, eneproc]
+      - [0x6196C0, .rodata, person]
+      - [0x619B90, .rodata, shim]
+      - [0x619D80, .rodata, demo]
+      - [0x61A100, .rodata, pipgauge]
+      - [0x61A110, .rodata, dmenu]
+      - [0x61A2C0, .rodata, demotool]
+
+  - name: ovl_0010
+    type: code
+    start: 0x61A700
+    vram: 0x801738A0
+    exclusive_ram_id: ovl_801738A0
+    subsegments:
+      # Source-file boundaries: splat's suggestions (functions padded with nops to 16 bytes), and
+      # two more where a file's .rodata (strings, then floats) begins after the last one's
+      # floats: 0x624E80 and 0x637420, the only 16-aligned function starts between them.
+      - [0x61A700, c, vanime]
+      - [0x61B5F0, c, bstub]
+      - [0x61B610, c, bmenu]
+      - [0x61BAC0, c, cockpit]
+      - [0x622300, c, bmove]
+      - [0x624E80, c, impact]
+      - [0x630D10, c, bappcam]
+      - [0x6326F0, c, brother]
+      - [0x637420, c, beffect]
+      - [0x640D60, c, bpause]
+      - [0x641BC0, .data, vanime]   # after the last jr $ra (0x8019AD50)
+      - [0x641BD0, .data, bmenu]
+      - [0x641BE0, .data, cockpit]
+      - [0x641BF0, .data, bmove]
+      - [0x6423E0, .data, impact]
+      - [0x642440, .data, brother]
+      - [0x642450, .data, beffect]
+      - [0x642650, .data, bpause]
+      - [0x642750, .rodata, vanime] # the first string ("[vanime_act] ..."), after .data's pad
+      - [0x6427E0, .rodata, bmenu]
+      - [0x642840, .rodata, cockpit]
+      - [0x643B00, .rodata, bmove]
+      - [0x643E80, .rodata, impact]
+      - [0x6449D0, .rodata, bappcam]
+      - [0x644A70, .rodata, brother]
+      - [0x644F30, .rodata, beffect]
+      - [0x6455F0, .rodata, bpause]
+
+  - name: files_0011
+    type: bin
+    start: 0x645630
+
+  - name: tlb_0016
+    type: code
+    start: 0x64C7F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x64C7F0, c, tlb/tlb_0016_0]
+      - [0x651F50, c, tlb/tlb_0016_1]
+      - [0x653980, .data, tlb/tlb_0016_0]
+      - [0x654840, .rodata, tlb/tlb_0016_0]
+      - [0x654B80, .rodata, tlb/tlb_0016_1]
+
+  - name: tlb_0017
+    type: code
+    start: 0x654C40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x654C40, c, tlb/tlb_0017_0]
+      - [0x657810, pad]
+      - [0x657820, c, tlb/tlb_0017_1]
+      - [0x6578E0, c, tlb/tlb_0017_2]
+      - [0x65C420, c, tlb/tlb_0017_3]
+      - [0x65C860, c, tlb/tlb_0017_4]
+      - [0x65C8D0, c, tlb/tlb_0017_5]
+      - [0x65DD40, c, tlb/tlb_0017_6]
+      - [0x65E930, .data, tlb/tlb_0017_2]
+      - [0x65EC00, .rodata, tlb/tlb_0017_0]
+      - [0x65ECC0, .rodata, tlb/tlb_0017_2]
+      - [0x65EE00, .rodata, tlb/tlb_0017_3]
+      - [0x65EE20, .rodata, tlb/tlb_0017_5]
+      - [0x65EE70, .rodata, tlb/tlb_0017_6]
+
+  - name: tlb_0018
+    type: code
+    start: 0x65EEA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x65EEA0, c, tlb/tlb_0018_0]
+      - [0x65FF10, c, tlb/tlb_0018_1]
+      - [0x6622F0, c, tlb/tlb_0018_2]
+      - [0x662410, c, tlb/tlb_0018_3]
+      - [0x662F50, c, tlb/tlb_0018_4]
+      - [0x664A60, c, tlb/tlb_0018_5]
+      - [0x666BE0, pad]
+      - [0x666BF0, c, tlb/tlb_0018_6]
+      - [0x667780, c, tlb/tlb_0018_7]
+      - [0x668D20, c, tlb/tlb_0018_8]
+      - [0x66A100, c, tlb/tlb_0018_9]
+      - [0x66A9F0, .data, tlb/tlb_0018_1]
+      - [0x66AB20, .data, tlb/tlb_0018_3]
+      - [0x66AC00, .data, tlb/tlb_0018_4]
+      - [0x66ACC0, .data, tlb/tlb_0018_7]
+      - [0x66AEA0, .data, tlb/tlb_0018_8]
+      - [0x66B0C0, .rodata, tlb/tlb_0018_0]
+      - [0x66B290, .rodata, tlb/tlb_0018_1]
+      - [0x66B480, .rodata, tlb/tlb_0018_3]
+      - [0x66BF90, .rodata, tlb/tlb_0018_4]
+      - [0x66BFC0, .rodata, tlb/tlb_0018_5]
+      - [0x66C110, .rodata, tlb/tlb_0018_6]
+      - [0x66C160, .rodata, tlb/tlb_0018_7]
+      - [0x66C1C0, .rodata, tlb/tlb_0018_8]
+      - [0x66C240, .rodata, tlb/tlb_0018_9]
+
+  - name: tlb_0019
+    type: code
+    start: 0x66C270
+    vram: 0x08000000
+    bss_size: 0x30
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x66C270, c, tlb/tlb_0019_0]
+      - [0x66DB80, c, tlb/tlb_0019_1]
+      - [0x672EB0, .data, tlb/tlb_0019_0]
+      # tlb_0019_1's .data starts with the characters' texture animations (0x08006C50): its
+      # code alone reads the light table after them.
+      - [0x672EC0, .data, tlb/tlb_0019_1]
+      - [0x6739B0, .rodata, tlb/tlb_0019_0]
+      - [0x673B50, .rodata, tlb/tlb_0019_1]
+      # The segment's whole .bss is tlb_0019_1's: WATER's bytes, then the speakers' statics.
+      - { type: .bss, vram: 0x08007FB0, name: tlb/tlb_0019_1 }
+
+  - name: tlb_0020
+    type: code
+    start: 0x674220
+    vram: 0x08000000
+    bss_size: 0x10
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x674220, c, tlb/tlb_0020_0]
+      - [0x6752F0, c, tlb/tlb_0020_1]
+      - [0x679550, .data, tlb/tlb_0020_0]
+      - [0x679560, .data, tlb/tlb_0020_1]
+      - [0x679FE0, .rodata, tlb/tlb_0020_0]
+      - [0x67A080, .rodata, tlb/tlb_0020_1]
+      # The segment's .bss is tlb_0020_1's: Ebisumaru's step, then Sasuke's two statics.
+      - { type: .bss, vram: 0x08006260, name: tlb/tlb_0020_1 }
+
+  - name: tlb_0021
+    type: code
+    start: 0x67A480
+    vram: 0x08000000
+    bss_size: 0x20
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x67A480, c, tlb/tlb_0021_0]
+      - [0x67EC10, c, tlb/tlb_0021_1]
+      - [0x681820, c, tlb/tlb_0021_2]
+      - [0x685400, pad]
+      - [0x685410, c, tlb/tlb_0021_3]
+      - [0x68ADA0, .data, tlb/tlb_0021_0]
+      - [0x68ADE0, .data, tlb/tlb_0021_1]
+      # tlb_0021_2's .data starts with its copy of the characters' texture animations (0x080113E0),
+      # which had sat in tlb_0021_1's opGateEffectDl; its code alone reads the data after it.
+      - [0x68B860, .data, tlb/tlb_0021_2]
+      - [0x68C2B0, .data, tlb/tlb_0021_3]
+      - [0x68CE00, .rodata, tlb/tlb_0021_0]
+      - [0x68D1B0, .rodata, tlb/tlb_0021_1]
+      - [0x68D470, .rodata, tlb/tlb_0021_2]
+      - [0x68D780, .rodata, tlb/tlb_0021_3]
+      # .bss: tlb_0021_1's OP1GOE keeps his player at 0x08013770; tlb_0021_3's flag stays splat's.
+      - { type: .bss, vram: 0x08013770, name: tlb/tlb_0021_1 }
+      - { type: bss, vram: 0x08013780, name: tlb/tlb_0021_bss }
+
+  - name: tlb_0022
+    type: code
+    start: 0x68DBF0
+    vram: 0x08000000
+    bss_size: 0x70
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x68DBF0, c, tlb/tlb_0022_0]
+      - [0x68EB80, c, tlb/tlb_0022_1]
+      - [0x693640, .data, tlb/tlb_0022_0]
+      # tlb_0022_1's .data: the characters' texture animations (0x08005A60), then its smoke's.
+      - [0x693650, .data, tlb/tlb_0022_1]
+      - [0x6940B0, .rodata, tlb/tlb_0022_0]
+      - [0x694160, .rodata, tlb/tlb_0022_1]
+      # The segment's whole .bss is tlb_0022_1's: jiji's statics, the globals, then the others'.
+      - { type: .bss, vram: 0x08006A90, name: tlb/tlb_0022_1 }
+
+  - name: tlb_0023
+    type: code
+    start: 0x694680
+    vram: 0x08000000
+    bss_size: 0x60
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x694680, c, tlb/tlb_0023_0]
+      - [0x696820, c, tlb/tlb_0023_1]
+      # .data: tlb_0023_0's frame count, padded to 16; tlb_0023_1's from its characters' texture
+      # animations (0x08008330).
+      - [0x69C9A0, .data, tlb/tlb_0023_0]
+      - [0x69C9B0, .data, tlb/tlb_0023_1]
+      - [0x69D5D0, .rodata, tlb/tlb_0023_0]
+      - [0x69D6C0, .rodata, tlb/tlb_0023_1]
+      # .bss: the omiDemo procs' skip counts and jiji's alpha are function statics (IDO_NOTES 343).
+      - { type: .bss, vram: 0x08009630, name: tlb/tlb_0023_0 }
+      - { type: .bss, vram: 0x08009640, name: tlb/tlb_0023_1 }
+
+  - name: tlb_0024
+    type: code
+    start: 0x69DCB0
+    vram: 0x08000000
+    bss_size: 0x40
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x69DCB0, c, tlb/tlb_0024_0]
+      - [0x69F210, c, tlb/tlb_0024_1]
+      # .data: tlb_0024_0's frame count, padded to 16; tlb_0024_1's from its characters' texture
+      # animations (0x08005770).
+      - [0x6A3410, .data, tlb/tlb_0024_0]
+      - [0x6A3420, .data, tlb/tlb_0024_1]
+      - [0x6A3E60, .rodata, tlb/tlb_0024_0]
+      - [0x6A3F10, .rodata, tlb/tlb_0024_1]
+      # .bss: A1CLEAR's skip count and tlb_0024_1's are function statics (IDO_NOTES 343).
+      - { type: .bss, vram: 0x080066A0, name: tlb/tlb_0024_0 }
+      - { type: .bss, vram: 0x080066B0, name: tlb/tlb_0024_1 }
+
+  - name: tlb_0025
+    type: code
+    start: 0x6A4350
+    vram: 0x08000000
+    bss_size: 0x70
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6A4350, c, tlb/tlb_0025_0]
+      - [0x6A5510, c, tlb/tlb_0025_1]
+      - [0x6A9AA0, .data, tlb/tlb_0025_0]
+      # tlb_0025_1's .data: the characters' texture animations (0x08005760), then its smoke's.
+      - [0x6A9AB0, .data, tlb/tlb_0025_1]
+      - [0x6AA510, .rodata, tlb/tlb_0025_0]
+      - [0x6AA5A0, .rodata, tlb/tlb_0025_1]
+      # The segment's whole .bss is tlb_0025_1's: its globals, then its demo characters' statics.
+      - { type: .bss, vram: 0x08006620, name: tlb/tlb_0025_1 }
+
+  - name: tlb_0026
+    type: code
+    start: 0x6AA970
+    vram: 0x08000000
+    bss_size: 0xA0
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6AA970, c, tlb/tlb_0026_0]
+      - [0x6ABAD0, c, tlb/tlb_0026_1]
+      - [0x6AF9E0, .data, tlb/tlb_0026_0]
+      # tlb_0026_1's .data: the characters' texture animations (0x08005080), then Suzaku's.
+      - [0x6AF9F0, .data, tlb/tlb_0026_1]
+      - [0x6B0420, .rodata, tlb/tlb_0026_0]
+      - [0x6B04B0, .rodata, tlb/tlb_0026_1]
+      # The segment's whole .bss is tlb_0026_1's: its globals, then its demo characters' statics.
+      - { type: .bss, vram: 0x08005FA0, name: tlb/tlb_0026_1 }
+
+  - name: tlb_0027
+    type: code
+    start: 0x6B0910
+    vram: 0x08000000
+    bss_size: 0xC0
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6B0910, c, tlb/tlb_0027_0]
+      - [0x6B3550, c, tlb/tlb_0027_1]
+      - [0x6B8E60, .data, tlb/tlb_0027_0]
+      # tlb_0027_1's .data: the characters' texture animations (0x08008570), the oni's, the smoke's.
+      - [0x6B8E80, .data, tlb/tlb_0027_1]
+      - [0x6B9930, .rodata, tlb/tlb_0027_0]
+      - [0x6B9A50, .rodata, tlb/tlb_0027_1]
+      # .bss: dochukiDemoCamScript's statics (0x08009650-0x0800968F) and tlb_0027_1's are
+      # function statics (IDO_NOTES 343).
+      - { type: .bss, vram: 0x08009650, name: tlb/tlb_0027_0 }
+      - { type: .bss, vram: 0x08009690, name: tlb/tlb_0027_1 }
+
+  - name: tlb_0028
+    type: code
+    start: 0x6B9F60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6B9F60, c, tlb/tlb_0028_0]
+      - [0x6BAF40, c, tlb/tlb_0028_1]
+      - [0x6BEB50, .data, tlb/tlb_0028_0]
+      # tlb_0028_1's .data starts with the characters' texture animations (0x08004C00); its code
+      # alone reads Sasuke's x and z after them.
+      - [0x6BEB60, .data, tlb/tlb_0028_1]
+      - [0x6BF5E0, .rodata, tlb/tlb_0028_0]
+      - [0x6BF660, .rodata, tlb/tlb_0028_1]
+
+  - name: tlb_0029
+    type: code
+    start: 0x6BFC40
+    vram: 0x08000000
+    bss_size: 0x20
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6BFC40, c, tlb/tlb_0029_0]
+      - [0x6C0F30, c, tlb/tlb_0029_1]
+      - [0x6C0F70, c, tlb/tlb_0029_2]
+      - [0x6C4840, .data, tlb/tlb_0029_0]
+      # tlb_0029_2's .data starts with the characters' texture animations (0x08004C10); its code
+      # alone reads Sasuke's x and z after them (tlb_0029_1 has no .data).
+      - [0x6C4850, .data, tlb/tlb_0029_2]
+      - [0x6C52E0, .rodata, tlb/tlb_0029_0]
+      - [0x6C5390, .rodata, tlb/tlb_0029_2]
+      # tlb_0029_2's whole .bss: its three demo characters' function-local statics.
+      - { type: .bss, vram: 0x08005C20, name: tlb/tlb_0029_2 }
+
+  - name: tlb_0030
+    type: code
+    start: 0x6C5860
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6C5860, c, tlb/tlb_0030_0]
+      - [0x6C68D0, c, tlb/tlb_0030_1]
+      - [0x6CAD80, .data, tlb/tlb_0030_0]
+      # tlb_0030_1's .data: the characters' texture animations (0x08005530), then the positions.
+      - [0x6CAD90, .data, tlb/tlb_0030_1]
+      - [0x6CB820, .rodata, tlb/tlb_0030_0]
+      - [0x6CB8D0, .rodata, tlb/tlb_0030_1]
+
+  - name: tlb_0031
+    type: code
+    start: 0x6CBCB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6CBCB0, c, tlb/tlb_0031_0]
+      - [0x6CD380, c, tlb/tlb_0031_1]
+      - [0x6D39F0, .data, tlb/tlb_0031_0]
+      # tlb_0031_1's .data: the characters' texture animations (0x08007D60), then the positions.
+      - [0x6D3A10, .data, tlb/tlb_0031_1]
+      - [0x6D45D0, .rodata, tlb/tlb_0031_0]
+      - [0x6D4690, .rodata, tlb/tlb_0031_1]
+
+  - name: tlb_0032
+    type: code
+    start: 0x6D4B30
+    vram: 0x08000000
+    bss_size: 0xA0
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6D4B30, c, tlb/tlb_0032_0]
+      - [0x6D6720, c, tlb/tlb_0032_1]
+      - [0x6DCDA0, .data, tlb/tlb_0032_0]
+      - [0x6DCDB0, .data, tlb/tlb_0032_1]
+      - [0x6DD9D0, .rodata, tlb/tlb_0032_0]
+      - [0x6DDAD0, .rodata, tlb/tlb_0032_1]
+      # tlb_0032_0's camera script keeps its background panel in a function-local static at
+      # 0x080094B0 (its .bss); the rest stays splat's.
+      - { type: .bss, vram: 0x080094B0, name: tlb/tlb_0032_0 }
+      - { type: .bss, vram: 0x080094C0, name: tlb/tlb_0032_1 }
+
+  - name: tlb_0033
+    type: code
+    start: 0x6DDFE0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6DDFE0, c, tlb/tlb_0033_0]
+      - [0x6E0D20, c, tlb/tlb_0033_1]
+      - [0x6E4050, c, tlb/tlb_0033_2]
+      - [0x6E9040, c, tlb/tlb_0033_3]
+      - [0x6EB4E0, c, tlb/tlb_0033_4]
+      - [0x6EB810, .data, tlb/tlb_0033_0]
+      - [0x6EB850, .data, tlb/tlb_0033_1]
+      - [0x6EC310, .data, tlb/tlb_0033_2]
+      - [0x6ECE90, .data, tlb/tlb_0033_3]
+      - [0x6ECF10, .rodata, tlb/tlb_0033_0]
+      - [0x6ED020, .rodata, tlb/tlb_0033_1]
+      - [0x6ED2B0, .rodata, tlb/tlb_0033_2]
+      - [0x6ED5B0, .rodata, tlb/tlb_0033_3]
+      - [0x6ED670, .rodata, tlb/tlb_0033_4]
+
+  - name: tlb_0034
+    type: code
+    start: 0x6ED710
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6ED710, c, tlb/tlb_0034]
+      - [0x6F4240, .data, tlb/tlb_0034]
+      - [0x6F4CB0, .rodata, tlb/tlb_0034]
+
+  - name: tlb_0035
+    type: code
+    start: 0x6F5070
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6F5070, c, tlb/tlb_0035]
+      - [0x6F8080, .data, tlb/tlb_0035]
+      - [0x6F8B60, .rodata, tlb/tlb_0035]
+
+  - name: tlb_0036
+    type: code
+    start: 0x6F8D90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x6F8D90, c, tlb/tlb_0036]
+      - [0x6F9550, .data, tlb/tlb_0036]
+      - [0x6F95D0, .rodata, tlb/tlb_0036]
+
+  - name: tlb_0037
+    type: code
+    start: 0x6F9620
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6F9620, c, tlb/tlb_0037]
+      - [0x6FF120, .rodata, tlb/tlb_0037]
+
+  - name: tlb_0038
+    type: code
+    start: 0x6FF5F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x6FF5F0, c, tlb/tlb_0038]
+      - [0x703DC0, .data, tlb/tlb_0038]
+      - [0x703DE0, .rodata, tlb/tlb_0038]
+
+  - name: tlb_0039
+    type: code
+    start: 0x704090
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x704090, c, tlb/tlb_0039]
+      - [0x70CFD0, .data, tlb/tlb_0039]
+      - [0x70D0B0, .rodata, tlb/tlb_0039]
+
+  - name: tlb_0040
+    type: code
+    start: 0x70D8D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x70D8D0, c, tlb/tlb_0040]
+      - [0x714FB0, .data, tlb/tlb_0040]
+      - [0x714FF0, .rodata, tlb/tlb_0040]
+
+  - name: tlb_0041
+    type: code
+    start: 0x7153E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7153E0, c, tlb/tlb_0041]
+      - [0x71C190, .data, tlb/tlb_0041]
+      - [0x71C1B0, .rodata, tlb/tlb_0041]
+
+  - name: tlb_0042
+    type: code
+    start: 0x71C620
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x71C620, c, tlb/tlb_0042]
+      - [0x724CE0, .data, tlb/tlb_0042]
+      - [0x724EC0, .rodata, tlb/tlb_0042]
+
+  - name: tlb_0043
+    type: code
+    start: 0x7252D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7252D0, c, tlb/tlb_0043]
+      - [0x725980, .data, tlb/tlb_0043]
+      - [0x725A00, .rodata, tlb/tlb_0043]
+
+  - name: tlb_0044
+    type: code
+    start: 0x725B10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x725B10, c, tlb/tlb_0044]
+      - [0x727580, .data, tlb/tlb_0044]
+      - [0x7275A0, .rodata, tlb/tlb_0044]
+
+  - name: tlb_0045
+    type: code
+    start: 0x7276A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7276A0, c, tlb/tlb_0045]
+      - [0x7278E0, .rodata, tlb/tlb_0045]
+
+  - name: tlb_0046
+    type: code
+    start: 0x7278F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7278F0, c, tlb/tlb_0046]
+      - [0x727FC0, .rodata, tlb/tlb_0046]
+
+  - name: tlb_0047
+    type: code
+    start: 0x728000
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x728000, c, tlb/tlb_0047]
+      - [0x728320, .rodata, tlb/tlb_0047]
+
+  - name: tlb_0048
+    type: code
+    start: 0x728360
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x728360, pad]
+      - [0x728370, c, tlb/tlb_0048]
+      - [0x72DAC0, .data, tlb/tlb_0048]
+      - [0x72DB30, .rodata, tlb/tlb_0048]
+
+  - name: tlb_0049
+    type: code
+    start: 0x72DD80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x72DD80, c, tlb/tlb_0049]
+      - [0x72E0A0, .rodata, tlb/tlb_0049]
+
+  - name: tlb_0050
+    type: code
+    start: 0x72E0E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x72E0E0, c, tlb/tlb_0050]
+      - [0x730070, .rodata, tlb/tlb_0050]
+
+  - name: tlb_0051
+    type: code
+    start: 0x730140
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x730140, c, tlb/tlb_0051]
+      - [0x730B30, .rodata, tlb/tlb_0051]
+
+  - name: tlb_0052
+    type: code
+    start: 0x730B90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x730B90, c, tlb/tlb_0052]
+      - [0x731210, .rodata, tlb/tlb_0052]
+
+  - name: tlb_0053
+    type: code
+    start: 0x731230
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x731230, c, tlb/tlb_0053]
+      - [0x734750, .data, tlb/tlb_0053]
+      - [0x734810, .rodata, tlb/tlb_0053]
+
+  - name: tlb_0054
+    type: code
+    start: 0x7349A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7349A0, c, tlb/tlb_0054]
+      - [0x7350B0, .rodata, tlb/tlb_0054]
+
+  - name: tlb_0055
+    type: code
+    start: 0x7350D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7350D0, c, tlb/tlb_0055]
+      - [0x736990, .rodata, tlb/tlb_0055]
+
+  - name: tlb_0056
+    type: code
+    start: 0x736A70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x736A70, c, tlb/tlb_0056]
+      - [0x737450, .rodata, tlb/tlb_0056]
+
+  - name: tlb_0057
+    type: code
+    start: 0x737490
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x737490, c, tlb/tlb_0057]
+      - [0x737B70, .rodata, tlb/tlb_0057]
+
+  - name: tlb_0058
+    type: code
+    start: 0x737BD0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x737BD0, c, tlb/tlb_0058]
+      - [0x737F90, .data, tlb/tlb_0058]
+      - [0x737FF0, .rodata, tlb/tlb_0058]
+
+  - name: tlb_0059
+    type: code
+    start: 0x738010
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x738010, c, tlb/tlb_0059]
+      - [0x7384C0, .rodata, tlb/tlb_0059]
+
+  - name: tlb_0060
+    type: code
+    start: 0x7384E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7384E0, c, tlb/tlb_0060]
+      - [0x739220, .data, tlb/tlb_0060]
+      - [0x7392E0, .rodata, tlb/tlb_0060]
+
+  - name: tlb_0061
+    type: code
+    start: 0x739320
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x739320, c, tlb/tlb_0061]
+      - [0x739750, .data, tlb/tlb_0061]
+      - [0x7397A0, .rodata, tlb/tlb_0061]
+
+  - name: tlb_0062
+    type: code
+    start: 0x7397B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7397B0, c, tlb/tlb_0062]
+      - [0x73ACC0, .data, tlb/tlb_0062]
+      - [0x73AD00, .rodata, tlb/tlb_0062]
+
+  - name: tlb_0063
+    type: code
+    start: 0x73AD90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73AD90, c, tlb/tlb_0063]
+      - [0x73D0B0, .rodata, tlb/tlb_0063]
+
+  - name: tlb_0064
+    type: code
+    start: 0x73D160
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73D160, c, tlb/tlb_0064]
+      - [0x73E550, .rodata, tlb/tlb_0064]
+
+  - name: tlb_0065
+    type: code
+    start: 0x73E610
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73E610, c, tlb/tlb_0065]
+      - [0x73EBA0, .data, tlb/tlb_0065]
+      - [0x73EC10, .rodata, tlb/tlb_0065]
+
+  - name: tlb_0066
+    type: code
+    start: 0x73EC20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73EC20, c, tlb/tlb_0066]
+      - [0x73F6D0, .rodata, tlb/tlb_0066]
+
+  - name: tlb_0067
+    type: code
+    start: 0x73F720
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73F720, c, tlb/tlb_0067]
+      - [0x73FEF0, .rodata, tlb/tlb_0067]
+
+  - name: tlb_0068
+    type: code
+    start: 0x73FF40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x73FF40, c, tlb/tlb_0068]
+      - [0x740440, .rodata, tlb/tlb_0068]
+
+  - name: tlb_0069
+    type: code
+    start: 0x740480
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x740480, c, tlb/tlb_0069]
+      - [0x7419F0, .data, tlb/tlb_0069]
+      - [0x741A70, .rodata, tlb/tlb_0069]
+
+  - name: tlb_0070
+    type: code
+    start: 0x741B30
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x741B30, c, tlb/tlb_0070]
+      - [0x742D00, .data, tlb/tlb_0070]
+      - [0x742D30, .rodata, tlb/tlb_0070]
+
+  - name: tlb_0071
+    type: code
+    start: 0x742DC0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x742DC0, c, tlb/tlb_0071]
+      - [0x743F10, .data, tlb/tlb_0071]
+      - [0x743F20, .rodata, tlb/tlb_0071]
+
+  - name: tlb_0072
+    type: code
+    start: 0x743F80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x743F80, c, tlb/tlb_0072]
+      - [0x7458A0, .rodata, tlb/tlb_0072]
+
+  - name: tlb_0073
+    type: code
+    start: 0x7459D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7459D0, c, tlb/tlb_0073]
+      - [0x7463A0, .rodata, tlb/tlb_0073]
+
+  - name: tlb_0074
+    type: code
+    start: 0x746450
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x746450, c, tlb/tlb_0074]
+      - [0x746770, .data, tlb/tlb_0074]
+      - [0x746790, .rodata, tlb/tlb_0074]
+
+  - name: tlb_0075
+    type: code
+    start: 0x7467B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7467B0, c, tlb/tlb_0075]
+      - [0x7468C0, .rodata, tlb/tlb_0075]
+
+  - name: tlb_0076
+    type: code
+    start: 0x7468D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7468D0, c, tlb/tlb_0076]
+      - [0x746D90, .rodata, tlb/tlb_0076]
+
+  - name: tlb_0077
+    type: code
+    start: 0x746DC0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x746DC0, c, tlb/tlb_0077]
+      - [0x746FD0, .rodata, tlb/tlb_0077]
+
+  - name: tlb_0078
+    type: code
+    start: 0x746FE0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x746FE0, c, tlb/tlb_0078]
+      - [0x74AC10, .data, tlb/tlb_0078]
+      - [0x74ACB0, .rodata, tlb/tlb_0078]
+
+  - name: tlb_0079
+    type: code
+    start: 0x74B010
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x74B010, c, tlb/tlb_0079]
+      - [0x74BFA0, .rodata, tlb/tlb_0079]
+
+  - name: tlb_0080
+    type: code
+    start: 0x74C070
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x74C070, c, tlb/tlb_0080]
+      - [0x74D2F0, .data, tlb/tlb_0080]
+      - [0x74D350, .rodata, tlb/tlb_0080]
+
+  - name: tlb_0081
+    type: code
+    start: 0x74D4B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x74D4B0, c, tlb/tlb_0081]
+      - [0x74F000, .data, tlb/tlb_0081]
+      - [0x74F090, .rodata, tlb/tlb_0081]
+
+  - name: tlb_0082
+    type: code
+    start: 0x74F1F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x74F1F0, c, tlb/tlb_0082]
+      - [0x750410, .rodata, tlb/tlb_0082]
+
+  - name: tlb_0083
+    type: code
+    start: 0x750500
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x750500, c, tlb/tlb_0083]
+      - [0x751790, .rodata, tlb/tlb_0083]
+
+  - name: tlb_0084
+    type: code
+    start: 0x751810
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x751810, c, tlb/tlb_0084]
+      - [0x7528C0, .rodata, tlb/tlb_0084]
+
+  - name: tlb_0085
+    type: code
+    start: 0x752950
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x752950, c, tlb/tlb_0085]
+      - [0x753160, .rodata, tlb/tlb_0085]
+
+  - name: tlb_0086
+    type: code
+    start: 0x7531D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7531D0, c, tlb/tlb_0086]
+      - [0x7550A0, .rodata, tlb/tlb_0086]
+
+  - name: tlb_0087
+    type: code
+    start: 0x7551E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7551E0, c, tlb/tlb_0087]
+      - [0x755710, .rodata, tlb/tlb_0087]
+
+  - name: tlb_0088
+    type: code
+    start: 0x7557A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7557A0, c, tlb/tlb_0088]
+      - [0x7561F0, .rodata, tlb/tlb_0088]
+
+  - name: tlb_0089
+    type: code
+    start: 0x756260
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x756260, c, tlb/tlb_0089]
+      - [0x7571B0, .rodata, tlb/tlb_0089]
+
+  - name: tlb_0090
+    type: code
+    start: 0x757230
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x757230, c, tlb/tlb_0090]
+      - [0x7585D0, .rodata, tlb/tlb_0090]
+
+  - name: tlb_0091
+    type: code
+    start: 0x758720
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x758720, c, tlb/tlb_0091]
+      - [0x758BF0, .data, tlb/tlb_0091]
+      - [0x758C80, .rodata, tlb/tlb_0091]
+
+  - name: tlb_0092
+    type: code
+    start: 0x758CB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x758CB0, c, tlb/tlb_0092]
+      - [0x7592B0, .rodata, tlb/tlb_0092]
+
+  - name: tlb_0093
+    type: code
+    start: 0x759300
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x759300, c, tlb/tlb_0093]
+      - [0x75A420, .data, tlb/tlb_0093]
+      - [0x75A520, .rodata, tlb/tlb_0093]
+
+  - name: tlb_0094
+    type: code
+    start: 0x75A640
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x75A640, c, tlb/tlb_0094]
+      - [0x75B8F0, .rodata, tlb/tlb_0094]
+
+  - name: tlb_0095
+    type: code
+    start: 0x75B9F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x75B9F0, c, tlb/tlb_0095]
+      - [0x75BE50, .data, tlb/tlb_0095]
+      - [0x75BEE0, .rodata, tlb/tlb_0095]
+
+  - name: tlb_0096
+    type: code
+    start: 0x75BF30
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x75BF30, c, tlb/tlb_0096]
+      - [0x75D950, .data, tlb/tlb_0096]
+      - [0x75D960, .rodata, tlb/tlb_0096]
+
+  - name: tlb_0097
+    type: code
+    start: 0x75DB10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x75DB10, c, tlb/tlb_0097]
+      - [0x760610, .data, tlb/tlb_0097]
+      - [0x760630, .rodata, tlb/tlb_0097]
+
+  - name: tlb_0098
+    type: code
+    start: 0x760840
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x760840, c, tlb/tlb_0098]
+      - [0x763FF0, .data, tlb/tlb_0098]
+      - [0x764030, .rodata, tlb/tlb_0098]
+
+  - name: tlb_0099
+    type: code
+    start: 0x764380
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x764380, c, tlb/tlb_0099]
+      - [0x767770, .data, tlb/tlb_0099]
+      - [0x7677C0, .rodata, tlb/tlb_0099]
+
+  - name: tlb_0100
+    type: code
+    start: 0x767A90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x767A90, c, tlb/tlb_0100]
+      - [0x7685F0, .rodata, tlb/tlb_0100]
+
+  - name: tlb_0101
+    type: code
+    start: 0x768710
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x768710, c, tlb/tlb_0101]
+      - [0x769680, .rodata, tlb/tlb_0101]
+
+  - name: tlb_0102
+    type: code
+    start: 0x7697A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7697A0, c, tlb/tlb_0102]
+      - [0x76AA70, .data, tlb/tlb_0102]
+      - [0x76AAF0, .rodata, tlb/tlb_0102]
+
+  - name: tlb_0103
+    type: code
+    start: 0x76AC50
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x76AC50, c, tlb/tlb_0103]
+      - [0x7700D0, .data, tlb/tlb_0103]
+      - [0x7702F0, .rodata, tlb/tlb_0103]
+
+  - name: tlb_0104
+    type: code
+    start: 0x770E80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x770E80, c, tlb/tlb_0104]
+      - [0x771900, .rodata, tlb/tlb_0104]
+
+  - name: tlb_0105
+    type: code
+    start: 0x771A50
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x771A50, c, tlb/tlb_0105]
+      - [0x773000, .data, tlb/tlb_0105]
+      - [0x773050, .rodata, tlb/tlb_0105]
+
+  - name: tlb_0106
+    type: code
+    start: 0x7731A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7731A0, c, tlb/tlb_0106]
+      - [0x7738D0, .rodata, tlb/tlb_0106]
+
+  - name: tlb_0107
+    type: code
+    start: 0x7739A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7739A0, c, tlb/tlb_0107]
+      - [0x774710, .data, tlb/tlb_0107]
+      - [0x7747B0, .rodata, tlb/tlb_0107]
+
+  - name: tlb_0108
+    type: code
+    start: 0x774910
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x774910, c, tlb/tlb_0108]
+      - [0x775500, .data, tlb/tlb_0108]
+      - [0x775600, .rodata, tlb/tlb_0108]
+
+  - name: tlb_0109
+    type: code
+    start: 0x775710
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x775710, c, tlb/tlb_0109]
+      - [0x77C120, .data, tlb/tlb_0109]
+      - [0x77C250, .rodata, tlb/tlb_0109]
+
+  - name: tlb_0110
+    type: code
+    start: 0x77CB40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x77CB40, c, tlb/tlb_0110]
+      - [0x77DC20, .data, tlb/tlb_0110]
+      - [0x77DC30, .rodata, tlb/tlb_0110]
+
+  - name: tlb_0111
+    type: code
+    start: 0x77DD70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x77DD70, c, tlb/tlb_0111]
+      - [0x77FFE0, .data, tlb/tlb_0111]
+      - [0x7800D0, .rodata, tlb/tlb_0111]
+
+  - name: tlb_0112
+    type: code
+    start: 0x780270
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x780270, c, tlb/tlb_0112]
+      - [0x780360, .data, tlb/tlb_0112]
+      - [0x780370, .rodata, tlb/tlb_0112]
+
+  - name: tlb_0113
+    type: code
+    start: 0x7803A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7803A0, c, tlb/tlb_0113]
+      - [0x780490, .data, tlb/tlb_0113]
+      - [0x7804A0, .rodata, tlb/tlb_0113]
+
+  - name: tlb_0114
+    type: code
+    start: 0x7804D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7804D0, c, tlb/tlb_0114]
+      - [0x781560, .data, tlb/tlb_0114]
+      - [0x7815F0, .rodata, tlb/tlb_0114]
+
+  - name: tlb_0115
+    type: code
+    start: 0x781830
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x781830, c, tlb/tlb_0115]
+      - [0x781920, .data, tlb/tlb_0115]
+      - [0x781930, .rodata, tlb/tlb_0115]
+
+  - name: tlb_0116
+    type: code
+    start: 0x781960
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x781960, c, tlb/tlb_0116]
+      - [0x781A50, .data, tlb/tlb_0116]
+      - [0x781A60, .rodata, tlb/tlb_0116]
+
+  - name: tlb_0117
+    type: code
+    start: 0x781A90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x781A90, c, tlb/tlb_0117]
+      - [0x782F90, .data, tlb/tlb_0117]
+      - [0x782FB0, .rodata, tlb/tlb_0117]
+
+  - name: tlb_0118
+    type: code
+    start: 0x783240
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x783240, c, tlb/tlb_0118]
+      - [0x783330, .data, tlb/tlb_0118]
+      - [0x783340, .rodata, tlb/tlb_0118]
+
+  - name: tlb_0119
+    type: code
+    start: 0x783370
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x783370, c, tlb/tlb_0119]
+      - [0x783460, .data, tlb/tlb_0119]
+      - [0x783470, .rodata, tlb/tlb_0119]
+
+  - name: tlb_0120
+    type: code
+    start: 0x7834A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7834A0, c, tlb/tlb_0120]
+      - [0x783590, .data, tlb/tlb_0120]
+      - [0x7835A0, .rodata, tlb/tlb_0120]
+
+  - name: tlb_0121
+    type: code
+    start: 0x7835D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7835D0, c, tlb/tlb_0121]
+      - [0x7846E0, .data, tlb/tlb_0121]
+      - [0x784710, .rodata, tlb/tlb_0121]
+
+  - name: tlb_0122
+    type: code
+    start: 0x7848F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7848F0, c, tlb/tlb_0122]
+      - [0x785E40, .data, tlb/tlb_0122]
+      - [0x785E70, .rodata, tlb/tlb_0122]
+
+  - name: tlb_0123
+    type: code
+    start: 0x786080
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x786080, c, tlb/tlb_0123]
+      - [0x787480, .data, tlb/tlb_0123]
+      - [0x7874B0, .rodata, tlb/tlb_0123]
+
+  - name: tlb_0124
+    type: code
+    start: 0x7876A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7876A0, c, tlb/tlb_0124]
+      - [0x788AB0, .data, tlb/tlb_0124]
+      - [0x788B70, .rodata, tlb/tlb_0124]
+
+  - name: tlb_0125
+    type: code
+    start: 0x788D60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x788D60, c, tlb/tlb_0125]
+      - [0x789E00, .data, tlb/tlb_0125]
+      - [0x789EC0, .rodata, tlb/tlb_0125]
+
+  - name: tlb_0126
+    type: code
+    start: 0x78A0A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x78A0A0, pad]
+      - [0x78A0B0, c, tlb/tlb_0126]
+      - [0x78D100, .data, tlb/tlb_0126]
+      - [0x78D270, .rodata, tlb/tlb_0126]
+
+  - name: tlb_0127
+    type: code
+    start: 0x78D840
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x78D840, c, tlb/tlb_0127]
+      - [0x790DC0, .data, tlb/tlb_0127]
+      - [0x790E40, .rodata, tlb/tlb_0127]
+
+  - name: tlb_0128
+    type: code
+    start: 0x7914C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7914C0, c, tlb/tlb_0128]
+      - [0x793320, .data, tlb/tlb_0128]
+      - [0x7933D0, .rodata, tlb/tlb_0128]
+
+  - name: tlb_0129
+    type: code
+    start: 0x793830
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x793830, c, tlb/tlb_0129]
+      - [0x797440, .data, tlb/tlb_0129]
+      - [0x7976B0, .rodata, tlb/tlb_0129]
+
+  - name: tlb_0130
+    type: code
+    start: 0x797F00
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x797F00, c, tlb/tlb_0130]
+      - [0x79A2D0, .data, tlb/tlb_0130]
+      - [0x79A370, .rodata, tlb/tlb_0130]
+
+  - name: tlb_0131
+    type: code
+    start: 0x79A870
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x79A870, c, tlb/tlb_0131]
+      - [0x7A01E0, .data, tlb/tlb_0131]
+      - [0x7A0E30, .rodata, tlb/tlb_0131]
+
+  - name: tlb_0132
+    type: code
+    start: 0x7A1A80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7A1A80, c, tlb/tlb_0132]
+      - [0x7A32B0, .data, tlb/tlb_0132]
+      - [0x7A32C0, .rodata, tlb/tlb_0132]
+
+  - name: tlb_0133
+    type: code
+    start: 0x7A3860
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7A3860, c, tlb/tlb_0133]
+      - [0x7A6340, .data, tlb/tlb_0133]
+      - [0x7A6350, .rodata, tlb/tlb_0133]
+
+  - name: tlb_0134
+    type: code
+    start: 0x7A6960
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7A6960, c, tlb/tlb_0134]
+      - [0x7AD6B0, .data, tlb/tlb_0134]
+      - [0x7AD800, .rodata, tlb/tlb_0134]
+
+  - name: tlb_0135
+    type: code
+    start: 0x7AE790
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7AE790, c, tlb/tlb_0135]
+      - [0x7B2C50, .data, tlb/tlb_0135]
+      - [0x7B2D00, .rodata, tlb/tlb_0135]
+
+  - name: tlb_0136
+    type: code
+    start: 0x7B34C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7B34C0, c, tlb/tlb_0136]
+      - [0x7B4560, .data, tlb/tlb_0136]
+      - [0x7B4580, .rodata, tlb/tlb_0136]
+
+  - name: tlb_0137
+    type: code
+    start: 0x7B4760
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7B4760, pad]
+      - [0x7B4780, c, tlb/tlb_0137]
+      - [0x7B73A0, .data, tlb/tlb_0137]
+      - [0x7B7450, .rodata, tlb/tlb_0137]
+
+  - name: tlb_0138
+    type: code
+    start: 0x7B7700
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7B7700, c, tlb/tlb_0138]
+      - [0x7B9480, .data, tlb/tlb_0138]
+      - [0x7B95B0, .rodata, tlb/tlb_0138]
+
+  - name: tlb_0139
+    type: code
+    start: 0x7B9990
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7B9990, c, tlb/tlb_0139]
+      - [0x7BB920, .rodata, tlb/tlb_0139]
+
+  - name: tlb_0140
+    type: code
+    start: 0x7BBA20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7BBA20, c, tlb/tlb_0140]
+      - [0x7BD5E0, .data, tlb/tlb_0140]
+      - [0x7BDC50, .rodata, tlb/tlb_0140]
+
+  - name: tlb_0141
+    type: code
+    start: 0x7BE070
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7BE070, c, tlb/tlb_0141]
+      - [0x7BFB80, .rodata, tlb/tlb_0141]
+
+  - name: tlb_0142
+    type: code
+    start: 0x7BFDB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7BFDB0, c, tlb/tlb_0142]
+      - [0x7C3BE0, .data, tlb/tlb_0142]
+      - [0x7C3C10, .rodata, tlb/tlb_0142]
+
+  - name: tlb_0143
+    type: code
+    start: 0x7C45A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C45A0, c, tlb/tlb_0143]
+      - [0x7C5890, .rodata, tlb/tlb_0143]
+
+  - name: tlb_0144
+    type: code
+    start: 0x7C5C00
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C5C00, c, tlb/tlb_0144]
+      - [0x7C5EA0, .rodata, tlb/tlb_0144]
+
+  - name: tlb_0145
+    type: code
+    start: 0x7C5EF0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C5EF0, c, tlb/tlb_0145]
+      - [0x7C6A90, .rodata, tlb/tlb_0145]
+
+  - name: tlb_0146
+    type: code
+    start: 0x7C6B60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C6B60, c, tlb/tlb_0146]
+      - [0x7C7BB0, .rodata, tlb/tlb_0146]
+
+  - name: tlb_0147
+    type: code
+    start: 0x7C7C90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C7C90, c, tlb/tlb_0147]
+      - [0x7C8B30, .rodata, tlb/tlb_0147]
+
+  - name: tlb_0148
+    type: code
+    start: 0x7C8BD0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7C8BD0, c, tlb/tlb_0148]
+      - [0x7CA530, .data, tlb/tlb_0148]
+      - [0x7CA5A0, .rodata, tlb/tlb_0148]
+
+  - name: tlb_0149
+    type: code
+    start: 0x7CA6E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CA6E0, c, tlb/tlb_0149]
+      - [0x7CBD20, .data, tlb/tlb_0149]
+      - [0x7CBF70, .rodata, tlb/tlb_0149]
+
+  - name: tlb_0150
+    type: code
+    start: 0x7CC0F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CC0F0, c, tlb/tlb_0150]
+      - [0x7CCDF0, .rodata, tlb/tlb_0150]
+
+  - name: tlb_0151
+    type: code
+    start: 0x7CCE70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CCE70, c, tlb/tlb_0151]
+      - [0x7CD290, .rodata, tlb/tlb_0151]
+
+  - name: tlb_0152
+    type: code
+    start: 0x7CD2E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CD2E0, c, tlb/tlb_0152]
+      - [0x7CDFA0, .data, tlb/tlb_0152]
+      - [0x7CDFE0, .rodata, tlb/tlb_0152]
+
+  - name: tlb_0153
+    type: code
+    start: 0x7CE100
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CE100, c, tlb/tlb_0153]
+      - [0x7CE5E0, .rodata, tlb/tlb_0153]
+
+  - name: tlb_0154
+    type: code
+    start: 0x7CE620
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CE620, c, tlb/tlb_0154]
+      - [0x7CF7E0, .data, tlb/tlb_0154]
+      - [0x7CF870, .rodata, tlb/tlb_0154]
+
+  - name: tlb_0155
+    type: code
+    start: 0x7CF960
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CF960, c, tlb/tlb_0155]
+      - [0x7CFEF0, .rodata, tlb/tlb_0155]
+
+  - name: tlb_0156
+    type: code
+    start: 0x7CFF50
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7CFF50, c, tlb/tlb_0156]
+      - [0x7D0910, .rodata, tlb/tlb_0156]
+
+  - name: tlb_0157
+    type: code
+    start: 0x7D09A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D09A0, c, tlb/tlb_0157]
+      - [0x7D1C00, .rodata, tlb/tlb_0157]
+
+  - name: tlb_0158
+    type: code
+    start: 0x7D1CB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D1CB0, c, tlb/tlb_0158]
+      - [0x7D2110, .rodata, tlb/tlb_0158]
+
+  - name: tlb_0159
+    type: code
+    start: 0x7D2180
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D2180, c, tlb/tlb_0159]
+      - [0x7D34A0, .rodata, tlb/tlb_0159]
+
+  - name: tlb_0160
+    type: code
+    start: 0x7D3560
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D3560, c, tlb/tlb_0160]
+      - [0x7D4130, .rodata, tlb/tlb_0160]
+
+  - name: tlb_0161
+    type: code
+    start: 0x7D41F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D41F0, c, tlb/tlb_0161]
+      - [0x7D4E20, .data, tlb/tlb_0161]
+      - [0x7D4EB0, .rodata, tlb/tlb_0161]
+
+  - name: tlb_0162
+    type: code
+    start: 0x7D4F10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D4F10, c, tlb/tlb_0162]
+      - [0x7D56B0, .rodata, tlb/tlb_0162]
+
+  - name: tlb_0163
+    type: code
+    start: 0x7D5710
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D5710, c, tlb/tlb_0163]
+      - [0x7D67E0, .rodata, tlb/tlb_0163]
+
+  - name: tlb_0164
+    type: code
+    start: 0x7D6840
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D6840, c, tlb/tlb_0164]
+      - [0x7D7EE0, .data, tlb/tlb_0164]
+      - [0x7D7FA0, .rodata, tlb/tlb_0164]
+
+  - name: tlb_0165
+    type: code
+    start: 0x7D8170
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D8170, c, tlb/tlb_0165]
+      - [0x7D8750, .rodata, tlb/tlb_0165]
+
+  - name: tlb_0166
+    type: code
+    start: 0x7D8790
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D8790, c, tlb/tlb_0166]
+      - [0x7D9B80, .data, tlb/tlb_0166]
+      - [0x7D9C50, .rodata, tlb/tlb_0166]
+
+  - name: tlb_0167
+    type: code
+    start: 0x7D9D20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7D9D20, c, tlb/tlb_0167]
+      - [0x7DA8F0, .rodata, tlb/tlb_0167]
+
+  - name: tlb_0168
+    type: code
+    start: 0x7DA950
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DA950, c, tlb/tlb_0168]
+      - [0x7DB870, .rodata, tlb/tlb_0168]
+
+  - name: tlb_0169
+    type: code
+    start: 0x7DB960
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DB960, c, tlb/tlb_0169]
+      - [0x7DD6B0, .rodata, tlb/tlb_0169]
+
+  - name: tlb_0170
+    type: code
+    start: 0x7DD820
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DD820, c, tlb/tlb_0170]
+      - [0x7DED00, .data, tlb/tlb_0170]
+      - [0x7DEE20, .rodata, tlb/tlb_0170]
+
+  - name: tlb_0171
+    type: code
+    start: 0x7DEEC0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DEEC0, c, tlb/tlb_0171]
+      - [0x7DF850, .data, tlb/tlb_0171]
+      - [0x7DF8D0, .rodata, tlb/tlb_0171]
+
+  - name: tlb_0172
+    type: code
+    start: 0x7DF950
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DF950, c, tlb/tlb_0172]
+      - [0x7DFB70, .rodata, tlb/tlb_0172]
+
+  - name: tlb_0173
+    type: code
+    start: 0x7DFB80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7DFB80, c, tlb/tlb_0173]
+      - [0x7E1B90, .data, tlb/tlb_0173]
+      - [0x7E1C90, .rodata, tlb/tlb_0173]
+
+  - name: tlb_0174
+    type: code
+    start: 0x7E1E90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E1E90, c, tlb/tlb_0174]
+      - [0x7E2F50, .data, tlb/tlb_0174]
+      - [0x7E3080, .rodata, tlb/tlb_0174]
+
+  - name: tlb_0175
+    type: code
+    start: 0x7E3130
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E3130, c, tlb/tlb_0175]
+      - [0x7E4420, .data, tlb/tlb_0175]
+      - [0x7E44F0, .rodata, tlb/tlb_0175]
+
+  - name: tlb_0176
+    type: code
+    start: 0x7E4600
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E4600, c, tlb/tlb_0176]
+      - [0x7E59D0, .data, tlb/tlb_0176]
+      - [0x7E5A60, .rodata, tlb/tlb_0176]
+
+  - name: tlb_0177
+    type: code
+    start: 0x7E5B80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E5B80, c, tlb/tlb_0177]
+      - [0x7E84A0, .data, tlb/tlb_0177]
+      - [0x7E85A0, .rodata, tlb/tlb_0177]
+
+  - name: tlb_0178
+    type: code
+    start: 0x7E8760
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E8760, c, tlb/tlb_0178]
+      - [0x7E8F70, .rodata, tlb/tlb_0178]
+
+  - name: tlb_0179
+    type: code
+    start: 0x7E8FA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7E8FA0, c, tlb/tlb_0179]
+      - [0x7EB8B0, .data, tlb/tlb_0179]
+      - [0x7EBA30, .rodata, tlb/tlb_0179]
+
+  - name: tlb_0180
+    type: code
+    start: 0x7EBC80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7EBC80, c, tlb/tlb_0180]
+      - [0x7ED610, .data, tlb/tlb_0180]
+      - [0x7EDD60, .rodata, tlb/tlb_0180]
+
+  - name: tlb_0181
+    type: code
+    start: 0x7EDDB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7EDDB0, c, tlb/tlb_0181]
+      - [0x7EEAB0, .data, tlb/tlb_0181]
+      - [0x7EEB30, .rodata, tlb/tlb_0181]
+
+  - name: tlb_0182
+    type: code
+    start: 0x7EEB90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7EEB90, c, tlb/tlb_0182]
+      - [0x7EECF0, .data, tlb/tlb_0182]
+      - [0x7EEFC0, .rodata, tlb/tlb_0182]
+
+  - name: tlb_0183
+    type: code
+    start: 0x7EEFD0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7EEFD0, c, tlb/tlb_0183]
+      - [0x7EF070, .data, tlb/tlb_0183]
+
+  - name: tlb_0184
+    type: code
+    start: 0x7EF220
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7EF220, c, tlb/tlb_0184_0]
+      - [0x7EF350, c, tlb/tlb_0184_1]
+      - [0x7EF4C0, c, tlb/tlb_0184_2]
+      - [0x7EF5F0, c, tlb/tlb_0184_3]
+      - [0x7EF720, .data, tlb/tlb_0184_0]
+      - [0x7F0610, .data, tlb/tlb_0184_1]
+      - [0x7F1800, .data, tlb/tlb_0184_2]
+      - [0x7F3C40, .data, tlb/tlb_0184_3]
+
+  - name: tlb_0185
+    type: code
+    start: 0x7F4C00
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F4C00, c, tlb/tlb_0185]
+      - [0x7F4C50, .data, tlb/tlb_0185]
+      - [0x7F4C60, .rodata, tlb/tlb_0185]
+
+  - name: tlb_0186
+    type: code
+    start: 0x7F4C80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F4C80, c, tlb/tlb_0186]
+      - [0x7F4D00, .data, tlb/tlb_0186]
+
+  - name: tlb_0187
+    type: code
+    start: 0x7F5030
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5030, c, tlb/tlb_0187]
+      - [0x7F50B0, .data, tlb/tlb_0187]
+
+  - name: tlb_0188
+    type: code
+    start: 0x7F5250
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5250, c, tlb/tlb_0188]
+      - [0x7F52A0, .data, tlb/tlb_0188]
+
+  - name: tlb_0189
+    type: code
+    start: 0x7F5330
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5330, c, tlb/tlb_0189]
+      - [0x7F53B0, .data, tlb/tlb_0189]
+
+  - name: tlb_0190
+    type: code
+    start: 0x7F5450
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5450, c, tlb/tlb_0190]
+      - [0x7F54C0, .data, tlb/tlb_0190]
+
+  - name: tlb_0191
+    type: code
+    start: 0x7F5800
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5800, c, tlb/tlb_0191]
+      - [0x7F5850, .data, tlb/tlb_0191]
+
+  - name: tlb_0192
+    type: code
+    start: 0x7F5890
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5890, c, tlb/tlb_0192]
+      - [0x7F58F0, .data, tlb/tlb_0192]
+
+  - name: tlb_0193
+    type: code
+    start: 0x7F5900
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F5900, c, tlb/tlb_0193]
+      - [0x7F5960, .data, tlb/tlb_0193]
+
+  - name: tlb_0194
+    type: code
+    start: 0x7F5970
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7F5970, c, tlb/tlb_0194]
+      - [0x7F5B40, .data, tlb/tlb_0194]
+      - [0x7F6650, .rodata, tlb/tlb_0194]
+
+  - name: tlb_0195
+    type: code
+    start: 0x7F6670
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7F6670, c, tlb/tlb_0195]
+      - [0x7F6840, .data, tlb/tlb_0195]
+
+  - name: tlb_0196
+    type: code
+    start: 0x7F73B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F73B0, c, tlb/tlb_0196]
+      - [0x7F7450, .data, tlb/tlb_0196]
+
+  - name: tlb_0197
+    type: code
+    start: 0x7F8380
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F8380, c, tlb/tlb_0197]
+      - [0x7F84C0, .data, tlb/tlb_0197]
+
+  - name: tlb_0198
+    type: code
+    start: 0x7F8EF0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F8EF0, c, tlb/tlb_0198]
+      - [0x7F9000, .data, tlb/tlb_0198]
+
+  - name: tlb_0199
+    type: code
+    start: 0x7F94C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7F94C0, c, tlb/tlb_0199]
+      - [0x7F96C0, .data, tlb/tlb_0199]
+      - [0x7F9760, .rodata, tlb/tlb_0199]
+
+  - name: tlb_0200
+    type: code
+    start: 0x7F97A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7F97A0, c, tlb/tlb_0200]
+      - [0x7F98C0, .data, tlb/tlb_0200]
+
+  - name: tlb_0201
+    type: code
+    start: 0x7FA3A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FA3A0, c, tlb/tlb_0201]
+      - [0x7FA4B0, .data, tlb/tlb_0201]
+
+  - name: tlb_0202
+    type: code
+    start: 0x7FAB40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FAB40, c, tlb/tlb_0202]
+      - [0x7FAC80, .data, tlb/tlb_0202]
+
+  - name: tlb_0203
+    type: code
+    start: 0x7FB080
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FB080, c, tlb/tlb_0203]
+      - [0x7FB180, .data, tlb/tlb_0203]
+
+  - name: tlb_0204
+    type: code
+    start: 0x7FB300
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7FB300, c, tlb/tlb_0204]
+      - [0x7FB570, .data, tlb/tlb_0204]
+      - [0x7FB630, .rodata, tlb/tlb_0204]
+
+  - name: tlb_0205
+    type: code
+    start: 0x7FB670
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FB670, c, tlb/tlb_0205]
+      - [0x7FB770, .data, tlb/tlb_0205]
+
+  - name: tlb_0206
+    type: code
+    start: 0x7FBAA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FBAA0, c, tlb/tlb_0206]
+      - [0x7FBB80, .data, tlb/tlb_0206]
+
+  - name: tlb_0207
+    type: code
+    start: 0x7FBD50
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7FBD50, c, tlb/tlb_0207]
+      - [0x7FBE50, .data, tlb/tlb_0207]
+
+  - name: tlb_0208
+    type: code
+    start: 0x7FC080
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FC080, c, tlb/tlb_0208]
+      - [0x7FC190, .data, tlb/tlb_0208]
+
+  - name: tlb_0209
+    type: code
+    start: 0x7FC2A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FC2A0, c, tlb/tlb_0209]
+      - [0x7FC380, .data, tlb/tlb_0209]
+
+  - name: tlb_0210
+    type: code
+    start: 0x7FC640
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FC640, c, tlb/tlb_0210]
+      - [0x7FC720, .data, tlb/tlb_0210]
+
+  - name: tlb_0211
+    type: code
+    start: 0x7FCA40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7FCA40, c, tlb/tlb_0211]
+      - [0x7FCC70, .data, tlb/tlb_0211]
+      - [0x7FD840, .rodata, tlb/tlb_0211]
+
+  - name: tlb_0212
+    type: code
+    start: 0x7FD870
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FD870, c, tlb/tlb_0212]
+      - [0x7FD960, .data, tlb/tlb_0212]
+
+  - name: tlb_0213
+    type: code
+    start: 0x7FDB30
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x7FDB30, c, tlb/tlb_0213]
+      - [0x7FDC30, .data, tlb/tlb_0213]
+
+  - name: tlb_0214
+    type: code
+    start: 0x7FE090
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FE090, c, tlb/tlb_0214]
+      - [0x7FE150, .data, tlb/tlb_0214]
+
+  - name: tlb_0215
+    type: code
+    start: 0x7FE390
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FE390, c, tlb/tlb_0215]
+      - [0x7FE4D0, .data, tlb/tlb_0215]
+
+  - name: tlb_0216
+    type: code
+    start: 0x7FEC80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FEC80, c, tlb/tlb_0216]
+      - [0x7FEDC0, .data, tlb/tlb_0216]
+
+  - name: tlb_0217
+    type: code
+    start: 0x7FF8E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FF8E0, c, tlb/tlb_0217]
+      - [0x7FF9A0, .data, tlb/tlb_0217]
+
+  - name: tlb_0218
+    type: code
+    start: 0x7FFC30
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x7FFC30, c, tlb/tlb_0218]
+      - [0x7FFCE0, .data, tlb/tlb_0218]
+
+  - name: tlb_0219
+    type: code
+    start: 0x8001F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8001F0, c, tlb/tlb_0219]
+      - [0x800300, .data, tlb/tlb_0219]
+
+  - name: tlb_0220
+    type: code
+    start: 0x8007B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8007B0, c, tlb/tlb_0220]
+      - [0x8008E0, .data, tlb/tlb_0220]
+
+  - name: tlb_0221
+    type: code
+    start: 0x800A80
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x800A80, c, tlb/tlb_0221]
+      - [0x800CD0, .data, tlb/tlb_0221]
+      - [0x800D80, .rodata, tlb/tlb_0221]
+
+  - name: tlb_0222
+    type: code
+    start: 0x800DC0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x800DC0, c, tlb/tlb_0222]
+      - [0x801010, .data, tlb/tlb_0222]
+      - [0x801020, .rodata, tlb/tlb_0222]
+
+  - name: tlb_0223
+    type: code
+    start: 0x801070
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x801070, c, tlb/tlb_0223]
+      - [0x801140, .data, tlb/tlb_0223]
+
+  - name: tlb_0224
+    type: code
+    start: 0x801D40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x801D40, c, tlb/tlb_0224]
+      - [0x801F30, .data, tlb/tlb_0224]
+      - [0x802890, .rodata, tlb/tlb_0224]
+
+  - name: tlb_0225
+    type: code
+    start: 0x8028B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x8028B0, c, tlb/tlb_0225]
+      - [0x802A90, .data, tlb/tlb_0225]
+      - [0x802E50, .rodata, tlb/tlb_0225]
+
+  - name: tlb_0226
+    type: code
+    start: 0x802E70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x802E70, c, tlb/tlb_0226]
+      - [0x803030, .data, tlb/tlb_0226]
+      - [0x8033D0, .rodata, tlb/tlb_0226]
+
+  - name: tlb_0227
+    type: code
+    start: 0x8033F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x8033F0, c, tlb/tlb_0227]
+      - [0x8035C0, .data, tlb/tlb_0227]
+      - [0x8038E0, .rodata, tlb/tlb_0227]
+
+  - name: tlb_0228
+    type: code
+    start: 0x803900
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x803900, c, tlb/tlb_0228]
+      - [0x803BB0, .data, tlb/tlb_0228]
+      - [0x8045F0, .rodata, tlb/tlb_0228]
+
+  - name: tlb_0229
+    type: code
+    start: 0x804610
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x804610, c, tlb/tlb_0229]
+      - [0x8047E0, .data, tlb/tlb_0229]
+      - [0x804E40, .rodata, tlb/tlb_0229]
+
+  - name: tlb_0230
+    type: code
+    start: 0x804E60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x804E60, c, tlb/tlb_0230]
+      - [0x805020, .data, tlb/tlb_0230]
+      - [0x805450, .rodata, tlb/tlb_0230]
+
+  - name: tlb_0231
+    type: code
+    start: 0x805470
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x805470, c, tlb/tlb_0231]
+      - [0x805610, .data, tlb/tlb_0231]
+      - [0x805C20, .rodata, tlb/tlb_0231]
+
+  - name: tlb_0232
+    type: code
+    start: 0x805C40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x805C40, c, tlb/tlb_0232]
+      - [0x805E30, .data, tlb/tlb_0232]
+      - [0x806CA0, .rodata, tlb/tlb_0232]
+
+  - name: tlb_0233
+    type: code
+    start: 0x806CD0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x806CD0, c, tlb/tlb_0233]
+      - [0x806E90, .data, tlb/tlb_0233]
+      - [0x807410, .rodata, tlb/tlb_0233]
+
+  - name: tlb_0234
+    type: code
+    start: 0x807440
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x807440, c, tlb/tlb_0234]
+      - [0x807670, .data, tlb/tlb_0234]
+      - [0x807F80, .rodata, tlb/tlb_0234]
+
+  - name: tlb_0235
+    type: code
+    start: 0x807FB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x807FB0, c, tlb/tlb_0235]
+      - [0x808710, .data, tlb/tlb_0235]
+
+  - name: tlb_0236
+    type: code
+    start: 0x80ADE0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x80ADE0, c, tlb/tlb_0236]
+      - [0x80AF60, .data, tlb/tlb_0236]
+      - [0x80B070, .rodata, tlb/tlb_0236]
+
+  - name: tlb_0237
+    type: code
+    start: 0x80B0A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x80B0A0, c, tlb/tlb_0237]
+      - [0x80B2C0, .data, tlb/tlb_0237]
+      - [0x80B370, .rodata, tlb/tlb_0237]
+
+  - name: tlb_0238
+    type: code
+    start: 0x80B3B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x80B3B0, c, tlb/tlb_0238]
+      - [0x80B5F0, .data, tlb/tlb_0238]
+
+  - name: tlb_0239
+    type: code
+    start: 0x80B690
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x80B690, c, tlb/tlb_0239]
+      - [0x80B740, .data, tlb/tlb_0239]
+
+  - name: tlb_0240
+    type: code
+    start: 0x80C140
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x80C140, c, tlb/tlb_0240]
+      - [0x80C1F0, .data, tlb/tlb_0240]
+
+  - name: tlb_0241
+    type: code
+    start: 0x80CC20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x80CC20, c, tlb/tlb_0241]
+      - [0x80CCF0, .data, tlb/tlb_0241]
+
+  - name: tlb_0242
+    type: code
+    start: 0x80CE20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x80CE20, c, tlb/tlb_0242]
+      - [0x80CEC0, .data, tlb/tlb_0242]
+
+  - name: tlb_0243
+    type: code
+    start: 0x80D030
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x80D030, c, tlb/tlb_0243]
+      - [0x80D3D0, .data, tlb/tlb_0243]
+
+  - name: tlb_0244
+    type: code
+    start: 0x80F2D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x80F2D0, c, tlb/tlb_0244]
+      - [0x80FA30, .data, tlb/tlb_0244]
+
+  - name: tlb_0245
+    type: code
+    start: 0x8117D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x8117D0, c, tlb/tlb_0245]
+      - [0x812130, .data, tlb/tlb_0245]
+
+  - name: tlb_0246
+    type: code
+    start: 0x813340
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x813340, c, tlb/tlb_0246]
+      - [0x813550, .data, tlb/tlb_0246]
+      - [0x813600, .rodata, tlb/tlb_0246]
+
+  - name: tlb_0247
+    type: code
+    start: 0x813640
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x813640, c, tlb/tlb_0247]
+      - [0x813820, .data, tlb/tlb_0247]
+
+  - name: tlb_0248
+    type: code
+    start: 0x8138F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x8138F0, c, tlb/tlb_0248]
+      - [0x813EC0, .data, tlb/tlb_0248]
+      - [0x8173E0, .rodata, tlb/tlb_0248]
+
+  - name: tlb_0249
+    type: code
+    start: 0x817420
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x817420, c, tlb/tlb_0249]
+      - [0x817DC0, .data, tlb/tlb_0249]
+
+  - name: tlb_0250
+    type: code
+    start: 0x81AE60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81AE60, c, tlb/tlb_0250]
+      - [0x81B0E0, .data, tlb/tlb_0250]
+      - [0x81B3C0, .rodata, tlb/tlb_0250]
+
+  - name: tlb_0251
+    type: code
+    start: 0x81BCB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81BCB0, c, tlb/tlb_0251]
+      - [0x81BEC0, .data, tlb/tlb_0251]
+      - [0x81BF60, .rodata, tlb/tlb_0251]
+
+  - name: tlb_0252
+    type: code
+    start: 0x81BFA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81BFA0, c, tlb/tlb_0252]
+      - [0x81C420, .data, tlb/tlb_0252]
+      - [0x81C550, .rodata, tlb/tlb_0252]
+
+  - name: tlb_0253
+    type: code
+    start: 0x81C5A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81C5A0, c, tlb/tlb_0253]
+      - [0x81C630, .data, tlb/tlb_0253]
+
+  - name: tlb_0254
+    type: code
+    start: 0x81C660
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81C660, c, tlb/tlb_0254]
+      - [0x81C6F0, .data, tlb/tlb_0254]
+
+  - name: tlb_0255
+    type: code
+    start: 0x81C720
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81C720, c, tlb/tlb_0255]
+      - [0x81C7B0, .data, tlb/tlb_0255]
+
+  - name: tlb_0256
+    type: code
+    start: 0x81C7E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81C7E0, c, tlb/tlb_0256]
+      - [0x81C870, .data, tlb/tlb_0256]
+
+  - name: tlb_0257
+    type: code
+    start: 0x81C8A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81C8A0, c, tlb/tlb_0257]
+      - [0x81C930, .data, tlb/tlb_0257]
+
+  - name: tlb_0258
+    type: code
+    start: 0x81C960
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81C960, c, tlb/tlb_0258]
+      - [0x81CA20, .data, tlb/tlb_0258]
+
+  - name: tlb_0259
+    type: code
+    start: 0x81CA90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81CA90, c, tlb/tlb_0259]
+      - [0x81CB40, .data, tlb/tlb_0259]
+
+  - name: tlb_0260
+    type: code
+    start: 0x81CC20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81CC20, c, tlb/tlb_0260]
+      - [0x81CCB0, .data, tlb/tlb_0260]
+
+  - name: tlb_0261
+    type: code
+    start: 0x81CCE0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81CCE0, c, tlb/tlb_0261]
+      - [0x81CD70, .data, tlb/tlb_0261]
+
+  - name: tlb_0262
+    type: code
+    start: 0x81CDA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81CDA0, c, tlb/tlb_0262]
+      - [0x81CE30, .data, tlb/tlb_0262]
+
+  - name: tlb_0263
+    type: code
+    start: 0x81CE70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81CE70, c, tlb/tlb_0263]
+      - [0x81CFB0, .data, tlb/tlb_0263]
+
+  - name: tlb_0264
+    type: code
+    start: 0x81D130
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81D130, c, tlb/tlb_0264]
+      - [0x81D870, .data, tlb/tlb_0264]
+      - [0x81DBF0, .rodata, tlb/tlb_0264]
+
+  - name: tlb_0265
+    type: code
+    start: 0x81DC00
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81DC00, c, tlb/tlb_0265]
+      - [0x81DD10, .data, tlb/tlb_0265]
+
+  - name: tlb_0266
+    type: code
+    start: 0x81E420
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81E420, c, tlb/tlb_0266]
+      - [0x81E4C0, .data, tlb/tlb_0266]
+
+  - name: tlb_0267
+    type: code
+    start: 0x81E530
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81E530, c, tlb/tlb_0267]
+      - [0x81E5E0, .data, tlb/tlb_0267]
+
+  - name: tlb_0268
+    type: code
+    start: 0x81E620
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81E620, c, tlb/tlb_0268]
+      - [0x81E6A0, .data, tlb/tlb_0268]
+
+  - name: tlb_0269
+    type: code
+    start: 0x81E700
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81E700, c, tlb/tlb_0269]
+      - [0x81E780, .data, tlb/tlb_0269]
+
+  - name: tlb_0270
+    type: code
+    start: 0x81E7B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81E7B0, c, tlb/tlb_0270]
+      - [0x81E830, .data, tlb/tlb_0270]
+
+  - name: tlb_0271
+    type: code
+    start: 0x81E910
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81E910, c, tlb/tlb_0271]
+      - [0x81E9A0, .data, tlb/tlb_0271]
+
+  - name: tlb_0272
+    type: code
+    start: 0x81E9D0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81E9D0, c, tlb/tlb_0272]
+      - [0x81EA90, .data, tlb/tlb_0272]
+
+  - name: tlb_0273
+    type: code
+    start: 0x81EB20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x81EB20, c, tlb/tlb_0273]
+      - [0x81EBE0, .data, tlb/tlb_0273]
+
+  - name: tlb_0274
+    type: code
+    start: 0x81EC90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81EC90, c, tlb/tlb_0274]
+      - [0x81ED40, .data, tlb/tlb_0274]
+
+  - name: tlb_0275
+    type: code
+    start: 0x81EE60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81EE60, c, tlb/tlb_0275]
+      - [0x81EF00, .data, tlb/tlb_0275]
+
+  - name: tlb_0276
+    type: code
+    start: 0x81F030
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F030, c, tlb/tlb_0276]
+      - [0x81F0E0, .data, tlb/tlb_0276]
+
+  - name: tlb_0277
+    type: code
+    start: 0x81F210
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F210, c, tlb/tlb_0277]
+      - [0x81F2B0, .data, tlb/tlb_0277]
+
+  - name: tlb_0278
+    type: code
+    start: 0x81F3B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F3B0, c, tlb/tlb_0278]
+      - [0x81F480, .data, tlb/tlb_0278]
+
+  - name: tlb_0279
+    type: code
+    start: 0x81F540
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F540, c, tlb/tlb_0279]
+      - [0x81F5F0, .data, tlb/tlb_0279]
+
+  - name: tlb_0280
+    type: code
+    start: 0x81F690
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F690, c, tlb/tlb_0280]
+      - [0x81F740, .data, tlb/tlb_0280]
+
+  - name: tlb_0281
+    type: code
+    start: 0x81F810
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F810, c, tlb/tlb_0281]
+      - [0x81F8C0, .data, tlb/tlb_0281]
+
+  - name: tlb_0282
+    type: code
+    start: 0x81F970
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81F970, c, tlb/tlb_0282]
+      - [0x81FA10, .data, tlb/tlb_0282]
+
+  - name: tlb_0283
+    type: code
+    start: 0x81FB90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81FB90, c, tlb/tlb_0283]
+      - [0x81FC40, .data, tlb/tlb_0283]
+
+  - name: tlb_0284
+    type: code
+    start: 0x81FD90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81FD90, c, tlb/tlb_0284]
+      - [0x81FE30, .data, tlb/tlb_0284]
+
+  - name: tlb_0285
+    type: code
+    start: 0x81FEB0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x81FEB0, c, tlb/tlb_0285]
+      - [0x81FF60, .data, tlb/tlb_0285]
+
+  - name: tlb_0286
+    type: code
+    start: 0x820060
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820060, c, tlb/tlb_0286]
+      - [0x820110, .data, tlb/tlb_0286]
+
+  - name: tlb_0287
+    type: code
+    start: 0x8201E0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8201E0, c, tlb/tlb_0287]
+      - [0x820280, .data, tlb/tlb_0287]
+
+  - name: tlb_0288
+    type: code
+    start: 0x820340
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820340, c, tlb/tlb_0288]
+      - [0x8203E0, .data, tlb/tlb_0288]
+
+  - name: tlb_0289
+    type: code
+    start: 0x8204A0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8204A0, c, tlb/tlb_0289]
+      - [0x820540, .data, tlb/tlb_0289]
+
+  - name: tlb_0290
+    type: code
+    start: 0x8205C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8205C0, c, tlb/tlb_0290]
+      - [0x820660, .data, tlb/tlb_0290]
+
+  - name: tlb_0291
+    type: code
+    start: 0x820730
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820730, c, tlb/tlb_0291]
+      - [0x8207D0, .data, tlb/tlb_0291]
+
+  - name: tlb_0292
+    type: code
+    start: 0x820870
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820870, c, tlb/tlb_0292]
+      - [0x820910, .data, tlb/tlb_0292]
+
+  - name: tlb_0293
+    type: code
+    start: 0x8209C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8209C0, c, tlb/tlb_0293]
+      - [0x820A60, .data, tlb/tlb_0293]
+
+  - name: tlb_0294
+    type: code
+    start: 0x820B10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820B10, c, tlb/tlb_0294]
+      - [0x820BB0, .data, tlb/tlb_0294]
+
+  - name: tlb_0295
+    type: code
+    start: 0x820C70
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820C70, c, tlb/tlb_0295]
+      - [0x820D10, .data, tlb/tlb_0295]
+
+  - name: tlb_0296
+    type: code
+    start: 0x820E10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x820E10, c, tlb/tlb_0296]
+      - [0x820EB0, .data, tlb/tlb_0296]
+
+  - name: tlb_0297
+    type: code
+    start: 0x821000
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821000, c, tlb/tlb_0297]
+      - [0x8210D0, .data, tlb/tlb_0297]
+
+  - name: tlb_0298
+    type: code
+    start: 0x821180
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821180, c, tlb/tlb_0298]
+      - [0x821230, .data, tlb/tlb_0298]
+
+  - name: tlb_0299
+    type: code
+    start: 0x821300
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821300, c, tlb/tlb_0299]
+      - [0x8213B0, .data, tlb/tlb_0299]
+
+  - name: tlb_0300
+    type: code
+    start: 0x8214F0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8214F0, c, tlb/tlb_0300]
+      - [0x8215A0, .data, tlb/tlb_0300]
+
+  - name: tlb_0301
+    type: code
+    start: 0x821640
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821640, c, tlb/tlb_0301]
+      - [0x8216E0, .data, tlb/tlb_0301]
+
+  - name: tlb_0302
+    type: code
+    start: 0x8217C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8217C0, c, tlb/tlb_0302]
+      - [0x821870, .data, tlb/tlb_0302]
+
+  - name: tlb_0303
+    type: code
+    start: 0x821930
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821930, c, tlb/tlb_0303]
+      - [0x8219D0, .data, tlb/tlb_0303]
+
+  - name: tlb_0304
+    type: code
+    start: 0x821A90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821A90, c, tlb/tlb_0304]
+      - [0x821B30, .data, tlb/tlb_0304]
+
+  - name: tlb_0305
+    type: code
+    start: 0x821BF0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821BF0, c, tlb/tlb_0305]
+      - [0x821C90, .data, tlb/tlb_0305]
+
+  - name: tlb_0306
+    type: code
+    start: 0x821D40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821D40, c, tlb/tlb_0306]
+      - [0x821DF0, .data, tlb/tlb_0306]
+
+  - name: tlb_0307
+    type: code
+    start: 0x821F10
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x821F10, c, tlb/tlb_0307]
+      - [0x822310, .data, tlb/tlb_0307]
+
+  - name: tlb_0308
+    type: code
+    start: 0x8229B0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8229B0, c, tlb/tlb_0308]
+      - [0x822A50, .data, tlb/tlb_0308]
+
+  - name: tlb_0309
+    type: code
+    start: 0x822B40
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x822B40, c, tlb/tlb_0309]
+      - [0x822BF0, .data, tlb/tlb_0309]
+
+  - name: tlb_0310
+    type: code
+    start: 0x822C90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x822C90, c, tlb/tlb_0310]
+      - [0x822D70, .data, tlb/tlb_0310]
+
+  - name: tlb_0311
+    type: code
+    start: 0x822E90
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x822E90, c, tlb/tlb_0311]
+      - [0x822F40, .data, tlb/tlb_0311]
+
+  - name: tlb_0312
+    type: code
+    start: 0x823000
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x823000, c, tlb/tlb_0312]
+      - [0x8230B0, .data, tlb/tlb_0312]
+
+  - name: tlb_0314
+    type: code
+    start: 0x823160
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x823160, c, tlb/tlb_0314]
+      - [0x8235C0, .data, tlb/tlb_0314]
+
+  - name: tlb_0315
+    type: code
+    start: 0x823850
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x823850, c, tlb/tlb_0315]
+      - [0x823E90, .data, tlb/tlb_0315]
+
+  - name: tlb_0316
+    type: code
+    start: 0x824590
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x824590, c, tlb/tlb_0316]
+      - [0x824960, .data, tlb/tlb_0316]
+
+  - name: tlb_0317
+    type: code
+    start: 0x824D00
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x824D00, c, tlb/tlb_0317]
+      - [0x8251A0, .data, tlb/tlb_0317]
+
+  - name: tlb_0318
+    type: code
+    start: 0x825860
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x825860, c, tlb/tlb_0318]
+      - [0x825E60, .data, tlb/tlb_0318]
+
+  - name: tlb_0319
+    type: code
+    start: 0x8263C0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x8263C0, c, tlb/tlb_0319]
+      - [0x8267C0, .data, tlb/tlb_0319]
+
+  - name: tlb_0320
+    type: code
+    start: 0x826D20
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x826D20, c, tlb/tlb_0320]
+      - [0x827050, .data, tlb/tlb_0320]
+
+  - name: tlb_0321
+    type: code
+    start: 0x827420
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    subsegments:
+      - [0x827420, c, tlb/tlb_0321]
+      - [0x827470, .data, tlb/tlb_0321]
+      - [0x8274F0, .rodata, tlb/tlb_0321]
+
+  - name: tlb_0322
+    type: code
+    start: 0x827510
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0009]
+    subsegments:
+      - [0x827510, c, tlb/tlb_0322_0]
+      - [0x827660, c, tlb/tlb_0322_1]
+      - [0x8277B0, c, tlb/tlb_0322_2]
+      - [0x827920, c, tlb/tlb_0322_3]
+      - [0x827C10, c, tlb/tlb_0322_4]
+      - [0x827D70, c, tlb/tlb_0322_5]
+      - [0x827F00, c, tlb/tlb_0322_6]
+      - [0x828040, c, tlb/tlb_0322_7]
+      - [0x828200, .data, tlb/tlb_0322_0]
+      - [0x828DF0, .data, tlb/tlb_0322_1]
+      - [0x8297D0, .data, tlb/tlb_0322_2]
+      - [0x82A860, .data, tlb/tlb_0322_3]
+      - [0x82CF20, .data, tlb/tlb_0322_4]
+      - [0x82DD90, .data, tlb/tlb_0322_5]
+      - [0x82F020, .data, tlb/tlb_0322_6]
+      - [0x830D30, .data, tlb/tlb_0322_7]
+
+  - name: tlb_0323
+    type: code
+    start: 0x831C30
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0010]
+    subsegments:
+      - [0x831C30, pad]
+      - [0x831C40, c, tlb/tlb_0323_0]
+      - [0x841830, c, tlb/tlb_0323_1]
+      - [0x846DA0, .data, tlb/tlb_0323_0]
+      - [0x846DC0, .rodata, tlb/tlb_0323_0]
+      - [0x847B00, .rodata, tlb/tlb_0323_1]
+
+  - name: tlb_0324
+    type: code
+    start: 0x847E60
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0010]
+    subsegments:
+      - [0x847E60, c, tlb/tlb_0324_0]
+      - [0x848370, pad]
+      - [0x848380, c, tlb/tlb_0324_1]
+      - [0x853A50, c, tlb/tlb_0324_2]
+      - [0x854460, c, tlb/tlb_0324_3]
+      - [0x857E10, c, tlb/tlb_0324_rand]
+      - [0x857F70, c, tlb/tlb_0324_4]
+      - [0x8587E0, c, tlb/tlb_0324_5]
+      - [0x85A360, c, tlb/tlb_0324_6]
+      - [0x860930, c, tlb/tlb_0324_7]
+      - [0x861D10, .data, tlb/tlb_0324_0]
+      # tlb_0324_1's .data (every word read there), then tlb_0324_2's from 0x08019F80 (IDO_NOTES 349).
+      - [0x861D20, .data, tlb/tlb_0324_1]
+      - [0x861DE0, .data, tlb/tlb_0324_2]
+      - [0x861DF0, .data, tlb/tlb_0324_3]
+      - [0x861E50, .data, tlb/tlb_0324_rand]
+      - [0x861E60, .data, tlb/tlb_0324_5]
+      - [0x861E70, .data, tlb/tlb_0324_6]
+      - [0x861F30, .data, tlb/tlb_0324_7]
+      - [0x861F70, .rodata, tlb/tlb_0324_0]
+      - [0x861FD0, .rodata, tlb/tlb_0324_1]
+      - [0x862B20, .rodata, tlb/tlb_0324_2]
+      - [0x863220, .rodata, tlb/tlb_0324_3]
+      - [0x8637F0, .rodata, tlb/tlb_0324_4]
+      - [0x863930, .rodata, tlb/tlb_0324_5]
+      - [0x863AA0, .rodata, tlb/tlb_0324_6]
+      - [0x863FB0, .rodata, tlb/tlb_0324_7]
+
+  - name: tlb_0325
+    type: code
+    start: 0x864170
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0010]
+    subsegments:
+      - [0x864170, c, tlb/tlb_0325_0]
+      - [0x864740, c, tlb/tlb_0325_1]
+      - [0x86E750, c, tlb/tlb_0325_2]
+      - [0x86F1F0, c, tlb/tlb_0325_3]
+      - [0x871C60, c, tlb/tlb_0325_rand]
+      - [0x871DC0, c, tlb/tlb_0325_4]
+      - [0x872510, c, tlb/tlb_0325_5]
+      - [0x873AA0, c, tlb/tlb_0325_6]
+      - [0x879110, c, tlb/tlb_0325_7]
+      - [0x87BAF0, .data, tlb/tlb_0325_4]
+      # tlb_0325_1's .data (read there), then tlb_0325_2's from 0x08017AA0 (IDO_NOTES 349).
+      - [0x87BB10, .data, tlb/tlb_0325_1]
+      - [0x87BC10, .data, tlb/tlb_0325_2]
+      - [0x87BC30, .data, tlb/tlb_0325_3]
+      - [0x87BCC0, .data, tlb/tlb_0325_rand]
+      # By their readers (IDO_NOTES 349): 0x08017B60-7F shared globals (an object between rand and
+      # _6, named _5 here); 0x08017B80-0x08017C3F tlb_0325_6's; 0x08017C40 on tlb_0325_7's.
+      - [0x87BCD0, .data, tlb/tlb_0325_5]
+      - [0x87BCF0, .data, tlb/tlb_0325_6]
+      - [0x87BDB0, .data, tlb/tlb_0325_7]
+      - [0x87BDE0, .rodata, tlb/tlb_0325_0]
+      - [0x87BE50, .rodata, tlb/tlb_0325_1]
+      - [0x87C830, .rodata, tlb/tlb_0325_2]
+      - [0x87CF30, .rodata, tlb/tlb_0325_3]
+      - [0x87D560, .rodata, tlb/tlb_0325_4]
+      - [0x87D6A0, .rodata, tlb/tlb_0325_5]
+      - [0x87D770, .rodata, tlb/tlb_0325_6]
+      - [0x87DAF0, .rodata, tlb/tlb_0325_7]
+
+  - name: tlb_0326
+    type: code
+    start: 0x87DDA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0010]
+    subsegments:
+      - [0x87DDA0, pad]
+      - [0x87DDB0, c, tlb/tlb_0326_0]
+      - [0x88EE10, c, tlb/tlb_0326_1]
+      - [0x894AC0, .data, tlb/tlb_0326_0]
+      - [0x894AE0, .rodata, tlb/tlb_0326_0]
+      - [0x895950, .rodata, tlb/tlb_0326_1]
+
+  - name: tlb_0327
+    type: code
+    start: 0x895EA0
+    vram: 0x08000000
+    exclusive_ram_id: tlb_08000000
+    prioritized_segments: [ovl_0010]
+    subsegments:
+      - [0x895EA0, pad]
+      - [0x895EB0, c, tlb/tlb_0327_0]
+      - [0x8A4F40, pad]
+      - [0x8A4F70, c, tlb/tlb_0327_1]
+      - [0x8ACD50, .data, tlb/tlb_0327_0]
+      - [0x8ACD70, .data, tlb/tlb_0327_1]
+      - [0x8ACE80, .rodata, tlb/tlb_0327_0]
+      - [0x8ADC70, .rodata, tlb/tlb_0327_1]
+
+  - name: files_0329
+    type: bin
+    start: 0x8AE3C0
+
+  - [0x19CE42E]

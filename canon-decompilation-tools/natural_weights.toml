@@ -1,0 +1,49 @@
+# Natural-only weights for decomp-permuter.
+#
+# For the FAKE marks no natural C was found for: a permuter search that
+# starts from the FAKE-free form, randomizes only the region of the proven compiler decision
+# (PERM_RANDOMIZE), and never writes C a person would not write. A run copies this table into its
+# permuter/natural/<func>/settings.toml; decomp-permuter applies it over default_weights.toml.
+# A hit still counts only if it matches AND reads as normal C (reviewed by hand).
+
+[weight_overrides]
+# kept: they respell natural C
+perm_temp_for_expr = 100
+perm_expand_expr = 20
+perm_reorder_stmts = 10
+perm_reorder_decls = 10
+perm_randomize_internal_type = 10
+perm_split_assignment = 10
+perm_condition = 10
+perm_struct_ref = 10
+perm_commutative = 5
+perm_inequalities = 5
+perm_compound_assignment = 5
+perm_chain_assignment = 5
+perm_long_chain_assignment = 3
+# off: each writes C a person would not write, changes behaviour, or deletes code
+perm_add_mask = 0
+perm_xor_zero = 0
+perm_mult_zero = 0
+perm_cast_simple = 0
+perm_refer_to_var = 0
+perm_refer_to_var_else = 0
+perm_never_true_test = 0
+perm_ins_block = 0
+perm_empty_stmt = 0
+perm_pad_var_decl = 0
+perm_dummy_comma_expr = 0
+perm_add_self_assignment = 0
+perm_duplicate_assignment = 0
+perm_factor_mult = 0
+perm_factor_shift = 0
+perm_add_sub = 0
+perm_sameline = 0
+perm_float_literal = 0
+perm_randomize_external_type = 0
+perm_randomize_function_type = 0
+perm_remove_ast = 0
+perm_remove_var = 0
+perm_inline = 0
+perm_var_cond_block = 0
+perm_alias_array = 0

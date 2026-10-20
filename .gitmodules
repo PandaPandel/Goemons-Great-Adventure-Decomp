@@ -1,0 +1,6 @@
+[submodule "lib/ultralib"]
+	path = lib/ultralib
+	url = https://github.com/decompals/ultralib.git
+[submodule "lib/zlib"]
+	path = lib/zlib
+	url = https://github.com/madler/zlib.git

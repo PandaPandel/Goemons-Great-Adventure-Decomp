@@ -1,0 +1,23 @@
+diff --git a/libc_impl.c b/libc_impl.c
+index a2d58b5..3229b20 100644
+--- a/libc_impl.c
++++ b/libc_impl.c
+@@ -248,7 +248,9 @@ static void memory_allocate(uint8_t* mem, uint32_t start, uint32_t end) {
+     assert(end <= MEM_REGION_START + MEM_REGION_SIZE);
+     // `start` will be passed to mmap,
+     // so it has to be host aligned in order to keep the guest's pages valid
++#ifndef __CYGWIN__ /* the mprotect below rounds; MSYS pages are 64 KB */
+     assert(start == TRUNC_PAGE(start) && "Page size too small, try increasing `page_size` in recomp.cpp");
++#endif
+ #ifdef __CYGWIN__
+     uintptr_t _start = TRUNC_PAGE((uintptr_t)mem + start);
+     uintptr_t _end = ROUND_PAGE((uintptr_t)mem + end);
+@@ -3069,6 +3071,8 @@ void wrapper___assert(uint8_t* mem, uint32_t assertion_addr, uint32_t file_addr,
+
+     #ifdef __FreeBSD__
+     __assert(assertion, file, line, NULL);
++    #elif defined(__CYGWIN__) /* newlib's order is (file, line, expr) */
++    __assert(file, line, assertion);
+     #else
+     __assert(assertion, file, line);
+     #endif

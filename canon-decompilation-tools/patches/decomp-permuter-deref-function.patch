@@ -1,0 +1,21 @@
+From, 2026-10-03. Apply in vendor/decomp-permuter (upstream 059609d):
+    git apply ../../canon-tools/patches/decomp-permuter-deref-function.patch
+Why: this decomp writes every call the game makes through a register as "(*func_X)(args)"
+(IDO compiles it to a jalr; "func_X(args)" is a jal), and the permuter's type pass crashed on
+it ("dereferencing non-pointer", beffect.c func_80198750 at iteration 3). "*f" of a function
+designator is the function itself (C11 6.5.3.2).
+
+diff --git a/src/ast_types.py b/src/ast_types.py
+index 50e6b89..b34ffc8 100644
+--- a/src/ast_types.py
++++ b/src/ast_types.py
+@@ -75,6 +75,9 @@ def get_decl_type(decl: ca.Decl) -> Type:
+
+ def deref_type(type: Type, typemap: TypeMap) -> Type:
+     type = resolve_typedefs(type, typemap)
++    if isinstance(type, ca.FuncDecl):
++        # "*f" of a function designator is the function itself (C11 6.5.3.2), as in "(*f)()"
++        return type
+     assert isinstance(type, (ca.ArrayDecl, ca.PtrDecl)), "dereferencing non-pointer"
+     return type.type
+

@@ -1,0 +1,164 @@
+Goemon's Great Adventure (Nintendo 64) - decompilation credits
+
+This decompilation stands on the work of the N64 decompilation community. Every tool,
+library and project below was used or consulted to build it, and each credit was checked
+against the project's own source (its git history, README, LICENSE or package metadata).
+Authors are named as each project names them; "and contributors" means many more people
+whose work is in it.
+
+
+SPECIAL THANKS
+==============
+
+Tools that build this decompilation
+-----------------------------------
+
+splat - splits the ROM into assembly, data and C stubs, and writes the linker script
+  Ethan Roseman (ethteck), with Anghelo Carvajal, Alex Bates, Mark Street and contributors
+  https://github.com/ethteck/splat
+
+spimdisasm and rabbitizer - splat's MIPS disassembler and instruction decoder
+  Anghelo Carvajal (AngheloAlf), Decompollaborate
+  https://github.com/Decompollaborate/spimdisasm
+  https://github.com/Decompollaborate/rabbitizer
+
+asm-processor - lets IDO compile C files that still hold functions as assembly
+(#pragma GLOBAL_ASM); every game C file and the zlib objects go through it
+  Simon Lindholm, with Anghelo Carvajal, Dragorn421, EllipticEllipsis, Mr-Wiseguy and
+  contributors
+  https://github.com/simonlindholm/asm-processor
+
+ido-static-recomp - the IRIX IDO 5.3 and 7.1 compilers, statically recompiled to run on
+modern machines
+  Emil Lenngren (original author); decompals: Ethan Roseman, Anghelo Carvajal, cadmic,
+  Derek Hensley and contributors
+  https://github.com/decompals/ido-static-recomp
+
+IDO (IRIS Development Option) 5.3 and 7.1 - the original C compilers the game was built
+with (7.1 for the game and zlib, 5.3 for libultra)
+  Silicon Graphics, Inc.
+
+GNU Binutils (mips64-elf as, ld, objcopy, objdump, ar)
+  The GNU Project / Free Software Foundation
+  https://sourceware.org/binutils/
+  Windows build from the libdragon toolchain: https://github.com/DragonMinded/libdragon
+
+devkitPro MSYS2 - its MSYS2 runtime runs the recompiled IDO on Windows, and its GCC and make
+built ido-static-recomp
+  devkitPro: https://devkitpro.org
+  MSYS2 (runtime forked from Cygwin): https://www.msys2.org
+  GCC and GNU make: the GNU Project / Free Software Foundation
+
+Python - every build and analysis tool here is Python
+  The Python Software Foundation; created by Guido van Rossum
+  https://www.python.org
+
+
+Libraries in the game
+---------------------
+
+ultralib - the decompiled libultra (the N64 SDK library); its sources build and match the
+game's libultra 2.0I/2.0J objects, and its headers serve the game's C
+  decompals: Derek Hensley, Mr-Wiseguy, Anghelo Carvajal, Tharo, Ethan Roseman and
+  contributors
+  https://github.com/decompals/ultralib
+
+zlib 1.1.3 - the game's file decompressor, built from the original source
+  Jean-loup Gailly and Mark Adler
+  https://github.com/madler/zlib
+
+
+Tools used to write it
+----------------------
+
+decomp-permuter - searches for C that compiles to the game's instructions
+  Simon Lindholm, with Synray, Dane Bouchie and contributors
+  https://github.com/simonlindholm/decomp-permuter
+
+m2c (formerly mips_to_c) - the first C draft of each file
+  Matt Kempster and Zach Banks (authors); maintained by Simon Lindholm, with contributors
+  https://github.com/matt-kempster/m2c
+
+asm-differ - compares the built functions with the game's
+  Simon Lindholm, with Léo Lam, Chippy, Ethan Roseman, Mark Street and contributors
+  https://github.com/simonlindholm/asm-differ
+
+pycparser - the C parser inside decomp-permuter and m2c
+  Eli Bendersky
+  https://github.com/eliben/pycparser
+
+n64sym - identifies libultra functions by their bytes
+  shygoo
+  https://github.com/shygoo/n64sym
+
+IDA Pro - used to study the game's own code (the Konami LZ decompressor)
+  Hex-Rays SA
+  https://hex-rays.com/ida-pro
+
+
+Decompilations consulted
+------------------------
+
+Super Smash Bros. - its libultra symbols named this game's libultra by signature
+  VetriTheRetri, John Liljegren, Santiago, Ryan Myers and contributors
+  https://github.com/VetriTheRetri/ssb-decomp-re
+
+Diddy Kong Racing - its audiomgr.c showed the N64 SDK's sample audio manager (SDK code only)
+  David Benepe (DavidSM64), Ryan Myers, Fazana, Antonio Castelli, Mittenshugg and
+  contributors
+  https://github.com/DavidSM64/Diddy-Kong-Racing
+
+Perfect Dark - its audiomgr.c, the same SDK audio manager, was prior art
+  Ryan Dwyer and contributors
+  https://gitlab.com/ryandwyer/perfect-dark
+
+GoldenEye 007 - its cubic spline code was the model for this game's spline evaluators, and
+its fabsf intrinsic pragma the model for ours
+  KholdFuzion (Larry Ficken)
+  https://gitlab.com/kholdfuzion/goldeneye_src
+
+The Legend of Zelda: Ocarina of Time - its fabsf intrinsic pragma; an IDO 7.1 sample
+  zeldaret and contributors
+  https://github.com/zeldaret/oot
+
+Pilotwings 64 - showed how to build libultra from source with per-file flags
+  Garrett Smith (gcsmith), queueRAM, Dominik Peters, inspectredc, SynaMax and contributors
+  https://github.com/gcsmith/Pilotwings64Decomp
+
+Banjo-Kazooie, Dr. Mario 64 and Snowboard Kids 2 - with Pilotwings 64, the decompilations
+whose use of ultralib showed the way to building against it
+  Banjo-Kazooie: the banjo.decomp group, mariob92, Cyrus Kashef, Bl00D4NGEL, MaikelChan
+  and contributors - https://gitlab.com/banjo.decomp/banjo-kazooie
+  Dr. Mario 64: Anghelo Carvajal (AngheloAlf) and contributors
+  - https://github.com/AngheloAlf/drmario64
+  Snowboard Kids 2: Chris Lewis, with thanks in its README to Bl00D4NGEL, inspectredc,
+  SlaveOfIDO and queueRAM - https://github.com/cdlewis/snowboardkids2-decomp
+
+Wave Race 64 - its n64sym results were the precedent for using n64sym in a decompilation
+  LLONSIT, sonicdcer, theboy181 and contributors
+  https://github.com/LLONSIT/Wave-Race-64
+
+
+Compiler-identification samples
+-------------------------------
+
+These decompilations were the labelled samples that showed this game was compiled with IDO
+(not GCC): their compilers are known, so their code calibrated the test.
+
+  Super Mario 64 - n64decomp - https://github.com/n64decomp/sm64
+  Mario Kart 64 - MegaMech, Tyler McGavran, coco875, CoderStig and contributors
+    - https://github.com/n64decomp/mk64
+  1080 Snowboarding - bigyoshi51 - https://github.com/bigyoshi51/1080-decomp
+  Mystical Ninja Starring Goemon (a different game) - klorfmorf
+    - https://github.com/klorfmorf/mnsg
+  Donkey Kong 64 - the dk64_decomp group - https://gitlab.com/dk64_decomp/dk64
+  Castlevania 64 (overlays) - moisesPC, Bsquo
+    - https://github.com/moisesPC/cv64_overlays_decomp
+  Glover - bigyoshi51 - https://github.com/bigyoshi51/glover-decomp
+  Gex 64 - MatBourgon, Tokatta007, Retrofuge and contributors
+    - https://github.com/MatBourgon/Gex64Decomp
+  (with Super Smash Bros., GoldenEye 007 and Ocarina of Time above)
+
+
+And to everyone in the N64 decompilation community whose tools, documentation and finished
+decompilations made this one possible.

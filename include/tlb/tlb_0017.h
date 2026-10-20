@@ -1,0 +1,95 @@
+#ifndef TLB_TLB_0017_H
+#define TLB_TLB_0017_H
+
+#include "common.h"
+#include "object.h"
+
+s32 getonProc(Obj *obj, s16 msg, void *arg);
+Gfx *effShowerLoadTex(Gfx *gfx, u16 scroll);
+Obj *effJetimpactMake(Obj *parent, s32 kind, f32 x, f32 y, f32 z);
+void effJetimpactAddItexs(Obj *obj);
+void effJetimpactFadeItexs(Obj *obj);
+void effJetimpactSetSteps(Obj *obj, s32 steps);
+void effJetimpactGetPos(Obj *obj, f32 *x, f32 *y, f32 *z);
+void effJetimpactSetPos(Obj *obj, f32 x, f32 y, f32 z);
+void effJetimpactMoveTo(Obj *obj, f32 x, f32 y, f32 z);
+void effJetimpactStop(Obj *obj);
+void effJetimpactSetScale(Obj *obj, f32 scale);
+void effJetimpactScaleTo(Obj *obj, f32 scale);
+void effJetimpactSetPlay(Obj *obj, f32 start, f32 end);
+void effJetimpactSetTilt(Obj *obj, f32 tilt);
+void effJetimpactHide(Obj *obj);
+void effJetimpactShow(Obj *obj);
+Obj *effKirariMake(Obj *parent, f32 x, f32 y, f32 z);
+void effKirariSetSteps(Obj *obj, f32 steps);
+void effKirariSetScale(Obj *obj, f32 scale);
+void effKirariScaleTo(Obj *obj, f32 scale);
+Obj *effShowerMake(Obj *parent, f32 x, f32 y, f32 z, f32 dir);
+void effShowerSetSteps(Obj *obj, f32 steps);
+void effShowerSetScale(Obj *obj, f32 x, f32 y, f32 z);
+void effShowerScaleTo(Obj *obj, f32 scale);
+void effShowerSetScroll(Obj *obj, s32 step);
+Obj *effLensflareMake(Obj *parent, f32 x, f32 y, f32 z);
+void effLensflareSetFade(Obj *obj, s32 step);
+Obj *effTractorMake(Obj *parent, s32 look, f32 x, f32 y, f32 z);
+void effTractorAimAt(Obj *obj, f32 x, f32 y, f32 z);
+void effTractorSetSteps(Obj *obj, f32 steps);
+void effTractorSetScale(Obj *obj, f32 x, f32 y, f32 z);
+void effTractorScaleTo(Obj *obj, f32 x, f32 y, f32 z);
+Obj *effCloudMake(Obj *parent, f32 x, f32 y, f32 z);
+void effCloudSetScale(Obj *obj, f32 x, f32 y, f32 z);
+void effCloudFadeOut(Obj *obj, s32 steps);
+void effCloudMoveTo(Obj *obj, f32 x, f32 y, f32 z);
+Obj *dhumanMake(Obj *parent, s32 index, s32 chara, f32 x, f32 y, f32 z);
+void dhumanSetSteps(Obj *obj, s32 steps);
+void dhumanGetPos(Obj *obj, f32 *x, f32 *y, f32 *z);
+void dhumanSetPos(Obj *obj, f32 x, f32 y, f32 z);
+void dhumanSetDir(Obj *obj, f32 dir);
+void dhumanMoveTo(Obj *obj, f32 x, f32 y, f32 z);
+void dhumanSetScale(Obj *obj, f32 scale);
+void dhumanScaleTo(Obj *obj, f32 scale);
+void dhumanSpin(Obj *obj);
+void dhumanSetAction13A(Obj *obj);
+void dhumanPlayAnime11F(Obj *obj);
+void dhumanPlayAnime120(Obj *obj);
+void dhumanPlayAnime121(Obj *obj);
+void dhumanHide(Obj *obj);
+void dhumanShow(Obj *obj);
+Obj *effTubeMake(Obj *parent, s32 look, f32 x, f32 y, f32 z);
+void effTubeSetSteps(Obj *obj, s32 steps);
+void effTubeSetGlowY(Obj *obj, f32 y);
+void effTubeGlowTo(Obj *obj, f32 y);
+Obj *effGhostMake(Obj *parent, s32 alpha);
+Obj *effDimpactMake(Obj *parent, s32 kind, f32 x, f32 y, f32 z);
+void effDimpactSetSteps(Obj *obj, s32 steps);
+void effDimpactMoveTo(Obj *obj, f32 x, f32 y, f32 z);
+void effDimpactSetPlay(Obj *obj, f32 start, f32 end);
+void effDimpactSetPose2(Obj *obj);
+void effDimpactSetDir(Obj *obj, f32 dir);
+void effDimpactSetTurn(Obj *obj, f32 turn);
+Obj *effKirakiraMake(Obj *obj);
+Obj *effKbackMake(Obj *obj);
+void effKbackHide(Obj *obj);
+void effKbackShow(Obj *obj);
+void effKbackSparkleMake(Obj *obj, f32 x, f32 y, f32 z, f32 size);
+Obj *effHeartbMake(Obj *parent, f32 x, f32 y, f32 z);
+void effHeartbMoveTo(Obj *obj, f32 x, f32 y, f32 z);
+Obj *effKflowerMake(Obj *obj);
+Obj *effGimMake(Obj *obj);
+void effGimSetPlay(Obj *obj, f32 steps, f32 start, f32 end);
+Obj *effGim2Make(Obj *obj);
+void effGim2SetPlay(Obj *obj, f32 steps, f32 start, f32 end);
+void effGim2SetRider(Obj *obj, Obj *rider);
+Obj *openingIdleMake(Obj *obj);
+s32 sabiProc(Obj *obj, s16 msg, void *arg);
+Obj *effKagayakeMake(Obj *obj);
+void effKagayakeSetPlay(Obj *obj, f32 dur, f32 start, f32 end);
+Obj *effAllcastMake(Obj *obj);
+Obj *effLballMake(Obj *parent, f32 x, f32 y, f32 z);
+void effLballSetScale(Obj *obj, f32 scale);
+void effLballSetSteps(Obj *obj, s32 steps);
+void effLballSetAlpha(Obj *obj, s32 alpha);
+void effLballFadeTo(Obj *obj, s32 alpha);
+void effLballScaleTo(Obj *obj, f32 scale);
+
+#endif
