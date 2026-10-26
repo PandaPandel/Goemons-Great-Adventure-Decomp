@@ -1,6 +1,16 @@
 Goemon's Great Adventure (Nintendo 64) - decompilation changelog
 Newest entry on top.
 
+2026-10-26
+- Building after an update: build_rom.py now splits the ROM again when goemonsgreatadv.yaml is newer than the
+  linker script made from it. Before, a checkout updated across a change to the yaml kept linking the old segments
+  and stopped on a missing C file (src/tlb/tlb_0184.c, for one). A fresh clone was never affected. Checked: an
+  older checkout updated this way builds to both SHA-1s with plain build_rom.py.
+- A bug of the original game, documented where it is (`//! @bug`, src/tlb/tlb_0198.c): the merchant in the town,
+  by the lizard man's house, walks in place against a wall, on a real N64 too. His route only turns him to face
+  180 degrees and loops; townspeople start out playing their walk, and nothing in his route sets a standing
+  animation. Found while porting the game, by reading his state live off a 3DS. The decomp keeps the game's bytes.
+
 2026-10-20
 - First public release. Every function and every data block of the US ROM is C that builds to
   both of the ROM's SHA-1s (the decompressed ROM's and the shipped ROM's), with real names, the

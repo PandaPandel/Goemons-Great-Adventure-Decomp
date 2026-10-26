@@ -238,7 +238,14 @@ def main():
                  "build_rom.py --setup` first (or set BINUTILS, IDO, IDO53, ASM_PROCESSOR).")
     if "--clean" in sys.argv and os.path.isdir(os.path.join(ROOT, "build")):
         shutil.rmtree(os.path.join(ROOT, "build"))
-    if "--split" in sys.argv or not os.path.isdir(os.path.join(ROOT, "asm")):
+    # The linker script is splat's, made from the yaml: one older than the yaml (an update that changed the yaml)
+    # lists the old segments, and the build looks for C files that are no longer there. Split again then, as a fresh
+    # clone does.
+    ld = os.path.join(ROOT, f"{NAME}.ld")
+    ld_stale = not os.path.isfile(ld) or os.path.getmtime(os.path.join(ROOT, f"{NAME}.yaml")) > os.path.getmtime(ld)
+    if ld_stale and os.path.isdir(os.path.join(ROOT, "asm")) and "--split" not in sys.argv:
+        print(f"build_rom: {NAME}.yaml is newer than {NAME}.ld: splitting again")
+    if "--split" in sys.argv or not os.path.isdir(os.path.join(ROOT, "asm")) or ld_stale:
         run([sys.executable, os.path.join(HERE, "nisitenma_archive.py"), "unpack"])
         split_start = time.time()
         run([sys.executable, "-m", "splat", "split", f"{NAME}.yaml"])

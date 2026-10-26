@@ -51,6 +51,10 @@ u16 stg0198PlacesEne139ParamPath[] = { 0x0009, 0x000A, 0x0000, 0x0017, 0x001B, 0
 PersonData stg0198PlacesEne139Param[] = {
     { 470, (u32) &stg0198PlacesEne139ParamPath, { 5, 8 }, 2, 0.0f, 0 },
 };
+//! @bug The merchant (ENE_SHOUNIN, placed at x 45, z -80 in stg0198Places) walks in place against a wall forever.
+//! His route only turns him to face 180 degrees and goes back to its start. A townsperson is made playing anims[1],
+//! the walk (personInit), and only a route's command 3 changes its animation; this route has none. Seen on a real
+//! N64 too. `{ 0x0003, 0x0000, 0x0002, 0x00B4, 0x0001, 0x0000 }` would have him stand.
 u16 stg0198PlacesEne13AParamPath[] = { 0x0002, 0x00B4, 0x0001, 0x0000 };
 PersonData stg0198PlacesEne13AParam[] = {
     { 471, (u32) &stg0198PlacesEne13AParamPath, { 5, 8 }, 0, 1.0f, 0 },
