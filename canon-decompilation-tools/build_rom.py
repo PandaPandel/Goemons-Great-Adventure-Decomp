@@ -238,13 +238,17 @@ def main():
                  "build_rom.py --setup` first (or set BINUTILS, IDO, IDO53, ASM_PROCESSOR).")
     if "--clean" in sys.argv and os.path.isdir(os.path.join(ROOT, "build")):
         shutil.rmtree(os.path.join(ROOT, "build"))
-    # The linker script is splat's, made from the yaml: one older than the yaml (an update that changed the yaml)
-    # lists the old segments, and the build looks for C files that are no longer there. Split again then, as a fresh
-    # clone does.
+    # The linker script is splat's, made from the yaml, symbol_addrs.txt and reloc_addrs.txt. One older than any of
+    # them (an update that changed one) lists the old segments or symbols, and the build looks for C files that are
+    # no longer there or comes out different. Split again then, as a fresh clone does.
     ld = os.path.join(ROOT, f"{NAME}.ld")
-    ld_stale = not os.path.isfile(ld) or os.path.getmtime(os.path.join(ROOT, f"{NAME}.yaml")) > os.path.getmtime(ld)
+    splat_inputs = [f"{NAME}.yaml", "symbol_addrs.txt", "reloc_addrs.txt"]  # what splat reads (the yaml's paths)
+    newer = [n for n in splat_inputs if os.path.isfile(ld) and os.path.isfile(os.path.join(ROOT, n))
+             and os.path.getmtime(os.path.join(ROOT, n)) > os.path.getmtime(ld)]
+    ld_stale = not os.path.isfile(ld) or bool(newer)
     if ld_stale and os.path.isdir(os.path.join(ROOT, "asm")) and "--split" not in sys.argv:
-        print(f"build_rom: {NAME}.yaml is newer than {NAME}.ld: splitting again")
+        why = f"{', '.join(newer)} newer than {NAME}.ld" if newer else f"no {NAME}.ld"
+        print(f"build_rom: {why}: splitting again")
     if "--split" in sys.argv or not os.path.isdir(os.path.join(ROOT, "asm")) or ld_stale:
         run([sys.executable, os.path.join(HERE, "nisitenma_archive.py"), "unpack"])
         split_start = time.time()
